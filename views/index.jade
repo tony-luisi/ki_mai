@@ -1,6 +1,7 @@
 extends layout
 
 block content
+
   div(class='container')
     h1= title
     p Welcome to #{title}
@@ -8,7 +9,7 @@ block content
       div(id='message-pane')
         ul(id='messages')
       form(action='')
-        input(id='m' autocomplete='off')
-        button send
-      script(type='text/javascript' src="/socket.io/socket.io.js")
-      script(type='text/javascript' src='./javascripts/bundle.js')
+        input(id='m' autocomplete='off' class='form-control')
+        button(class='btn btn-success') send
+  script(type='text/javascript' src="/socket.io/socket.io.js")
+  script(type='text/javascript' src='./javascripts/bundle.js')
