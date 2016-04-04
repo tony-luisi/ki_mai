@@ -9850,7 +9850,9 @@ var wordArray = []
 $('form').submit(function(){
   var message = $('#m').val()
   console.log(message)
-  socket.emit('message', { message: message })
+  if (message !== '') {
+    socket.emit('message', { message: message })
+  }
   $('#m').val('');
   return false
 })
@@ -9862,13 +9864,11 @@ socket.on('message', function (data) {
 
 socket.on('translate', function(data) {
     console.log('received - appending', data)
+    createDefinition(data)
     data.map(function(element){
       for (phrase in element){
           $('#search-pane').append('<p>'+element[phrase]+'<p>')
       }
-
-
-
     })
 
 })
@@ -9884,5 +9884,19 @@ $('#m').on('keyup', function() {
     }
   })
 })
+
+
+function createDefinition(wordsObject){
+
+  console.log('definitions: ', wordsObject.length)
+  console.log("word: ", wordsObject[0].english_search)
+  wordsObject.map(function(word){
+    console.log("maori translation: ", word.maori_search)
+    console.log('english sentence: ', word.english_sentence)
+    console.log('maori sentence: ', word.maori_sentence)
+  })
+
+  return wordsObject
+}
 
 },{"jquery":1}]},{},[2]);

@@ -9,7 +9,8 @@ a {
   height: 30em;
   border-color: pink;
   border-width: thick;
-  outline: 1px solid; }
+  outline: 1px solid;
+  overflow-y: scroll; }
 
 #messages {
   list-style-type: none;
