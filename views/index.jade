@@ -5,11 +5,21 @@ block content
   div(class='container')
     h1= title
     p Welcome to #{title}
-    div(class='col-md-6')
-      div(id='message-pane')
-        ul(id='messages')
-      form(action='')
-        input(id='m' autocomplete='off' class='form-control')
-        button(class='btn btn-success') send
+    div(class='row' id='titles')
+      div(class='col-md-6')
+        h1 Chat
+      div(class='col-md-6')
+        h1 Search
+    div(class='row' id='main-text-area')
+      div(class='col-md-6')
+        div(id='message-pane')
+          ul(id='messages')
+      div(class='col-md-6')
+        div(id='search-pane')
+    div(class='row' id='chat-area')
+      div(class='col-md-12')
+        form(action='')
+          input(id='m' autocomplete='off' class='form-control')
+          button(class='btn btn-success') send
   script(type='text/javascript' src="/socket.io/socket.io.js")
   script(type='text/javascript' src='./javascripts/bundle.js')

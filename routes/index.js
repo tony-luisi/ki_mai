@@ -1,18 +1,6 @@
 var express = require('express');
 var router = express.Router();
-
-
-/* GET home page. */
-
-
-
-
-// io.on('connection', function (socket) {
-//   socket.emit('news', { hello: 'world' });
-//   socket.on('my other event', function (data) {
-//     console.log(data);
-//   });
-// });
+var english = require('../english')
 
 
 module.exports = function(io) {
@@ -27,6 +15,12 @@ module.exports = function(io) {
     socket.on('message', function(message){
       console.log('the message is ', message)
       io.emit('message', message)
+    })
+
+    socket.on('translate', function(word){
+      console.log('need to translate word', word)
+      var translatedWord = english.getWord(word.text.substring(0,word.text.length-1))
+      socket.emit('translate', translatedWord)
     })
 
   })
