@@ -2,9 +2,9 @@ var $ = require('jquery')
 var socket = io.connect('http://localhost:3000');
 var wordArray = []
 
+//when the user enters a message into the chat window
 $('form').submit(function(){
   var message = $('#m').val()
-  console.log(message)
   if (message !== '') {
     socket.emit('message', { message: message })
   }
@@ -12,44 +12,59 @@ $('form').submit(function(){
   return false
 })
 
+//when a user receives a chat message into the chat window
 socket.on('message', function (data) {
-  console.log('received', data)
   $('#messages').append($('<li>').text(data.message))
+  var element = document.getElementById('message-pane')
+  element.scrollTop += 100
 })
 
+//when receiving a translated message
 socket.on('translate', function(data) {
-    console.log('received - appending', data)
-    createDefinition(data)
-    data.map(function(element){
-      for (phrase in element){
-          $('#search-pane').append('<p>'+element[phrase]+'<p>')
-      }
-    })
-
+  console.log('translation', data)
+  if (data.length > 0){
+    var definition = createDefinition(data)
+    $('#search-pane').append(definition)
+    var element = document.getElementById('search-pane')
+    element.scrollTop += 1000
+  }
 })
 
+//when a user types a key in the chat - and wants a word to be translated
 $('#m').on('keyup', function() {
+
   var message = $('#m').val()
   message = message.split(' ')
   message.map(function(word){
     if (word.endsWith('$') && wordArray.indexOf(word) === -1) {
       wordArray.push(word)
-      console.log(wordArray)
       socket.emit('translate', { text: word })
     }
   })
 })
 
-
+//creating an element for the translation and returning it
 function createDefinition(wordsObject){
+  //outside tag
+  var definitionDiv = document.createElement('div')
+  definitionDiv.className = 'overall-definition'
+  //word
 
-  console.log('definitions: ', wordsObject.length)
-  console.log("word: ", wordsObject[0].english_search)
-  wordsObject.map(function(word){
-    console.log("maori translation: ", word.maori_search)
-    console.log('english sentence: ', word.english_sentence)
-    console.log('maori sentence: ', word.maori_sentence)
+  wordsObject.map(function(theWord){
+    var singleWordDiv = document.createElement('div')
+    singleWordDiv.className = 'single-definition'
+    var word = document.createElement('p')
+    word.innerHTML = theWord.english_search + " > " + theWord.maori_search
+    singleWordDiv.appendChild(word)
+    var englishSentence = document.createElement('p')
+    englishSentence.innerHTML = theWord.english_sentence
+    singleWordDiv.appendChild(englishSentence)
+    var maoriSentence = document.createElement('p')
+    maoriSentence.innerHTML = theWord.maori_sentence
+    singleWordDiv.appendChild(maoriSentence)
+    definitionDiv.appendChild(singleWordDiv)
   })
 
-  return wordsObject
+
+  return definitionDiv
 }

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "build": "browserify ./src/index.js > ./public/javascripts/bundle.js",
+    "build": "watchify ./src/index.js -o ./public/javascripts/bundle.js -v",
     "dev": "nodemon"
   },
   "dependencies": {
@@ -22,6 +22,7 @@
     "superagent": "^1.8.3"
   },
   "devDependencies": {
-    "browserify": "^13.0.0"
+    "browserify": "^13.0.0",
+    "watchify": "^3.7.0"
   }
 }

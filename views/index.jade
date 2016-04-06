@@ -1,28 +1,22 @@
 extends layout
 
 block content
-  nav(class='navbar navbar-default')
-    div(class='container-fluid')
-      div(class='navbar-header')
-        button(type='button' class='navbar-toggle-collapsed' data-toggle='collapse')
-  div(class='container')
-    h1= title
-    p Welcome to #{title}
+  div(class='container-fluid')
     div(class='row' id='titles')
       div(class='col-md-6')
-        h1 Chat
+        h3 Chat
       div(class='col-md-6')
-        h1 Search
+        h3 Translate
     div(class='row' id='main-text-area')
-      div(class='col-md-6')
+      div(class='col-md-6 col-sm=12')
         div(id='message-pane')
           ul(id='messages')
-      div(class='col-md-6')
+      div(class='col-md-6 col-sm-12')
         div(id='search-pane')
     div(class='row' id='chat-area')
       div(class='col-md-12')
         form(action='')
           input(id='m' autocomplete='off' class='form-control')
-          button(class='btn btn-success') send
+          button(class='btn btn-success') Send
   script(type='text/javascript' src="/socket.io/socket.io.js")
   script(type='text/javascript' src='./javascripts/bundle.js')
