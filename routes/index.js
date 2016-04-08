@@ -8,7 +8,10 @@ module.exports = function(io) {
   var router = app.Router()
 
   router.get('/', function(req, res, next) {
-    res.render('index', { title: 'Ki Mai' });
+    var username = req.query.username
+    username = username.charAt(0).toUpperCase() + username.substring(1)
+    console.log(username)
+    res.render('index', { title: 'Ki Mai', name: username });
   });
 
   io.on('connection', function(socket) {
