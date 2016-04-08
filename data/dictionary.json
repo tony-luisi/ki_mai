@@ -1,0 +1,29 @@
+[
+  {
+    "maori_sentence": "<strong>tēnā koe</strong>, e haere ana koe ki whea?",
+    "english_sentence": "<strong>hello</strong>, where are you going?",
+    "english_display": "<strong>hello</strong>",
+    "maori_display": "<strong>tēnā koe</strong>,<strong> kia ora</strong>",
+    "maori_search": "tēnā koe, kia ora",
+    "english_search": "hello",
+    "type": "english"
+  },
+  {
+    "maori_sentence": "<strong>tēnā kōrua</strong>, e haere ana kōrua ki whea?",
+    "english_sentence": "<strong>hello</strong>, where are you two going?",
+    "english_display": "<strong>hello</strong>",
+    "maori_display": "<strong>tēnā kōrua</strong>,<strong> kia ora</strong>",
+    "maori_search": "tēnā kōrua, kia ora",
+    "english_search": "hello",
+    "type": "english"
+  },
+  {
+    "maori_sentence": "<strong>tēnā koutou</strong>, e haere ana koutou ki whea?",
+    "english_sentence": "<strong>hello</strong>, where are you all going?",
+    "english_display": "<strong>hello</strong>",
+    "maori_display": "<strong>tēnā koutou</strong>,<strong> kia ora</strong>",
+    "maori_search": "tēnā koutou, kia ora",
+    "english_search": "hello",
+    "type": "english"
+  }
+]
