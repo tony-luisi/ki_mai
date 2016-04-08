@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var english = require('../english')
+var english = require('../lib/english')
 
 
 module.exports = function(io) {
@@ -8,7 +8,7 @@ module.exports = function(io) {
   var router = app.Router()
 
   router.get('/', function(req, res, next) {
-    var username = req.query.username
+    var username = req.query.username || 'user'
     username = username.charAt(0).toUpperCase() + username.substring(1)
     console.log(username)
     res.render('index', { title: 'Ki Mai', name: username });
