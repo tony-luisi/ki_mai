@@ -9844,12 +9844,16 @@ return jQuery;
 
 },{}],2:[function(require,module,exports){
 var $ = require('jquery')
-var socket = io.connect('http://localhost:3000');
+var socket = io.connect('http://localhost:3000', function(){
+  console.log("connected!")
+});
 var wordArray = []
+var definitionArray = []
 
 //when the user enters a message into the chat window
 $('form').submit(function(){
-  var message = $('#m').val()
+  var user = $('#username').text()
+  var message = user + ": " + $('#m').val()
   if (message !== '') {
     socket.emit('message', { message: message })
   }
@@ -9859,7 +9863,7 @@ $('form').submit(function(){
 
 //when a user receives a chat message into the chat window
 socket.on('message', function (data) {
-  $('#messages').append($('<li>').text(data.message))
+  $('#messages').append($('<li class="animated fadeInUp">').text(data.message))
   var element = document.getElementById('message-pane')
   element.scrollTop += 100
 })
@@ -9870,6 +9874,8 @@ socket.on('translate', function(data) {
   if (data.length > 0){
     var definition = createDefinition(data)
     $('#search-pane').append(definition)
+    definitionArray.push(definition)
+    console.log(definitionArray)
     var element = document.getElementById('search-pane')
     element.scrollTop += 1000
   }
@@ -9877,10 +9883,10 @@ socket.on('translate', function(data) {
 
 //when a user types a key in the chat - and wants a word to be translated
 $('#m').on('keyup', function() {
-
   var message = $('#m').val()
   message = message.split(' ')
   message.map(function(word){
+    word = word.toLowerCase()
     if (word.endsWith('$') && wordArray.indexOf(word) === -1) {
       wordArray.push(word)
       socket.emit('translate', { text: word })
@@ -9892,8 +9898,8 @@ $('#m').on('keyup', function() {
 function createDefinition(wordsObject){
   //outside tag
   var definitionDiv = document.createElement('div')
-  definitionDiv.className = 'overall-definition'
-  //word
+  definitionDiv.className = 'overall-definition animated fadeIn'
+  definitionDiv.id = wordsObject[0].english_search
 
   wordsObject.map(function(theWord){
     var singleWordDiv = document.createElement('div')
@@ -9909,8 +9915,6 @@ function createDefinition(wordsObject){
     singleWordDiv.appendChild(maoriSentence)
     definitionDiv.appendChild(singleWordDiv)
   })
-
-
   return definitionDiv
 }
 
