@@ -9873,7 +9873,9 @@ socket.on('translate', function(data) {
   console.log('translation', data)
   if (data.length > 0){
     var definition = createDefinition(data)
+    var word = createWord(data)
     $('#search-pane').append(definition)
+    $('#word-list').append(word)
     definitionArray.push(definition)
     console.log(definitionArray)
     var element = document.getElementById('search-pane')
@@ -9894,6 +9896,26 @@ $('#m').on('keyup', function() {
   })
 })
 
+function showDef(event){
+  var wordToMatch = event.target.innerText
+  $('#search-pane').text("")
+  $('#search-pane').append(definitionArray[wordArray.indexOf(wordToMatch + "$")])
+  console.log('array', definitionArray)
+
+}
+
+function createWord(wordsObject){
+  var wordDiv = document.createElement('button')
+  wordDiv.className = 'word btn btn-default'
+  var word = document.createElement('p')
+  var theWord = wordsObject[0].english_search
+  word.innerHTML = theWord
+  word.id = theWord
+  wordDiv.onclick = showDef
+  wordDiv.appendChild(word)
+  return wordDiv
+}
+
 //creating an element for the translation and returning it
 function createDefinition(wordsObject){
   //outside tag
@@ -9902,8 +9924,8 @@ function createDefinition(wordsObject){
   definitionDiv.id = wordsObject[0].english_search
 
   wordsObject.map(function(theWord){
-    var singleWordDiv = document.createElement('div')
-    singleWordDiv.className = 'single-definition'
+    var singleWordDiv = document.createElement('button')
+    singleWordDiv.className = 'single-definition btn btn-default'
     var word = document.createElement('p')
     word.innerHTML = theWord.english_search + " > " + theWord.maori_search
     singleWordDiv.appendChild(word)

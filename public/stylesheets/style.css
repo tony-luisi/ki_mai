@@ -13,6 +13,14 @@ a {
   outline: 1px solid;
   overflow-y: scroll; }
 
+#word-list {
+  height: 40em;
+  width: 100%;
+  border-color: pink;
+  border-width: thick;
+  outline: 1px solid;
+  overflow-y: scroll; }
+
 #messages {
   list-style-type: none;
   margin: 0;
@@ -42,9 +50,14 @@ a {
   outline: 10px solid; }
 
 .single-definition {
+  width: 100%;
   border-color: pink;
-  border-width: thick;
   outline: 1px solid; }
+
+.word {
+  width: 100%;
+  outline: 1px solid;
+  text-align: left; }
 
 strong {
   background-color: #800000; }
