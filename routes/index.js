@@ -1,7 +1,16 @@
 var express = require('express');
 var router = express.Router();
 var english = require('../lib/english')
-
+var path = require('path')
+var Spellchecker = require("hunspell-spellchecker");
+var spellchecker = new Spellchecker();
+var fs = require('fs')
+var DICT = spellchecker.parse({
+    aff: fs.readFileSync(path.join(__dirname,'../lib/spelling/mi_NZ.aff')),
+    dic: fs.readFileSync(path.join(__dirname,'../lib/spelling/mi_NZ.dic'))
+});
+console.log(path.join(__dirname,'../lib/spelling/mi_NZ.aff'))
+spellchecker.use(DICT)
 
 module.exports = function(io) {
   var app = require('express')
@@ -24,6 +33,13 @@ module.exports = function(io) {
       console.log('need to translate word', word)
       var translatedWord = english.getWord(word.text.substring(0,word.text.length-1))
       socket.emit('translate', translatedWord)
+    })
+
+    socket.on('spelling', function(word){
+      console.log('need to spell check word', word)
+      var isRight = spellchecker.checkExact(word);
+      console.log("SPELLED CORRECTLY: ", word, isRight)
+      console.log("suggest", spellchecker.suggest(word))
     })
 
   })

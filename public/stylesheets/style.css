@@ -8,17 +8,13 @@ a {
 #message-pane {
   height: 40em;
   width: 100%;
-  border-color: pink;
   border-width: thick;
-  outline: 1px solid;
   overflow-y: scroll; }
 
 #word-list {
   height: 40em;
   width: 100%;
-  border-color: pink;
   border-width: thick;
-  outline: 1px solid;
   overflow-y: scroll; }
 
 #messages {
@@ -33,26 +29,26 @@ a {
 #search-pane {
   height: 40em;
   width: 100%;
-  border-color: pink;
   border-width: thick;
-  outline: 1px solid;
   overflow-y: scroll; }
 
 #main-text-area {
   display: flex; }
 
-#chat-area {
-  padding-top: 2em; }
+#phrase-pane {
+  height: 2em;
+  font-size: 2em;
+  line-height: 2em;
+  vertical-align: middle; }
 
 .overall-definition {
-  border-color: pink;
   border-width: thick;
   outline: 10px solid; }
 
 .single-definition {
   width: 100%;
-  border-color: pink;
-  outline: 1px solid; }
+  outline: 1px solid;
+  white-space: normal; }
 
 .word {
   width: 100%;

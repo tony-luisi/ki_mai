@@ -9844,9 +9844,7 @@ return jQuery;
 
 },{}],2:[function(require,module,exports){
 var $ = require('jquery')
-var socket = io.connect('http://localhost:3000', function(){
-  console.log("connected!")
-});
+var socket = io.connect('http://localhost:3000');
 var wordArray = []
 var definitionArray = []
 
@@ -9870,14 +9868,12 @@ socket.on('message', function (data) {
 
 //when receiving a translated message
 socket.on('translate', function(data) {
-  console.log('translation', data)
-  if (data.length > 0){
+    if (data.length > 0){
     var definition = createDefinition(data)
     var word = createWord(data)
     $('#search-pane').append(definition)
     $('#word-list').append(word)
     definitionArray.push(definition)
-    console.log(definitionArray)
     var element = document.getElementById('search-pane')
     element.scrollTop += 1000
   }
@@ -9886,6 +9882,7 @@ socket.on('translate', function(data) {
 //when a user types a key in the chat - and wants a word to be translated
 $('#m').on('keyup', function() {
   var message = $('#m').val()
+  updatePhrasePane(message)
   message = message.split(' ')
   message.map(function(word){
     word = word.toLowerCase()
@@ -9896,12 +9893,24 @@ $('#m').on('keyup', function() {
   })
 })
 
+function updatePhrasePane(message){
+  $('#phrase-pane').text(message)
+  var phrase = $('#phrase-pane').text().split(' ')
+  var parsedPhrase = phrase.map(function(word){
+    return word.replace(/[^\w\s]/gi, '')
+
+  })
+  console.log('phrase', phrase)
+  console.log('parsed', parsedPhrase)
+  if (parsedPhrase.length > 0)
+    socket.emit('spelling', phrase[0])
+}
+
 function showDef(event){
   var wordToMatch = event.target.innerText
-  $('#search-pane').text("")
-  $('#search-pane').append(definitionArray[wordArray.indexOf(wordToMatch + "$")])
-  console.log('array', definitionArray)
-
+  $('#search-pane').scrollTop(0)
+  var positionDifference = $("#"+wordToMatch).position().top - $('#search-pane').scrollTop()
+  $('#search-pane').scrollTop(positionDifference)
 }
 
 function createWord(wordsObject){
@@ -9910,7 +9919,6 @@ function createWord(wordsObject){
   var word = document.createElement('p')
   var theWord = wordsObject[0].english_search
   word.innerHTML = theWord
-  word.id = theWord
   wordDiv.onclick = showDef
   wordDiv.appendChild(word)
   return wordDiv
