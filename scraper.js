@@ -1,6 +1,6 @@
 var request = require('superagent')
 var cheerio = require('cheerio')
-var word = 'dinner'
+var word = 'potae'
 
 
 request.get('http://maoridictionary.co.nz/search?idiom=&phrase=&proverb=&loan=&histLoanWords=&keywords=' + word)
@@ -23,7 +23,9 @@ request.get('http://maoridictionary.co.nz/search?idiom=&phrase=&proverb=&loan=&h
     $('section').each(function(i,elem){
       var singleDef = {}
       singleDef.title = $(this).find('.title')
+      //singleDef.example = $(this).find('.detail').find('.example')
       singleDef.detail = $(this).find('.detail')
+
       arrayDef.push(singleDef)
       //console.log('length',$(this).find('.detail').length)
       //console.log("Title: ", $(this).find('.title').text())
