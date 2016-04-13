@@ -6,13 +6,13 @@ a {
   color: #00B7FF; }
 
 #message-pane {
-  height: 40em;
+  height: 30em;
   width: 100%;
   border-width: thick;
   overflow-y: scroll; }
 
 #word-list {
-  height: 40em;
+  height: 30em;
   width: 100%;
   border-width: thick;
   overflow-y: scroll; }
@@ -27,7 +27,7 @@ a {
     background: #343C7A; }
 
 #search-pane {
-  height: 40em;
+  height: 30em;
   width: 100%;
   border-width: thick;
   overflow-y: scroll; }
@@ -36,10 +36,10 @@ a {
   display: flex; }
 
 #phrase-pane {
-  height: 2em;
   font-size: 2em;
-  line-height: 2em;
-  vertical-align: middle; }
+  line-height: 1em;
+  vertical-align: middle;
+  margin-top: 1em; }
 
 .overall-definition {
   border-width: thick;

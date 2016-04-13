@@ -35,11 +35,12 @@ module.exports = function(io) {
       socket.emit('translate', translatedWord)
     })
 
-    socket.on('spelling', function(word){
+    socket.on('spelling', function(word, callback){
       console.log('need to spell check word', word)
       var isRight = spellchecker.checkExact(word);
       console.log("SPELLED CORRECTLY: ", word, isRight)
       console.log("suggest", spellchecker.suggest(word))
+      callback(isRight)
     })
 
   })

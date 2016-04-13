@@ -2,6 +2,7 @@ var $ = require('jquery')
 var socket = io.connect('http://localhost:3000');
 var wordArray = []
 var definitionArray = []
+var phraseArray = []
 
 //when the user enters a message into the chat window
 $('form').submit(function(){
@@ -36,6 +37,7 @@ socket.on('translate', function(data) {
 
 //when a user types a key in the chat - and wants a word to be translated
 $('#m').on('keyup', function() {
+  checkPhraseSpelling()
   var message = $('#m').val()
   updatePhrasePane(message)
   message = message.split(' ')
@@ -48,21 +50,68 @@ $('#m').on('keyup', function() {
   })
 })
 
+//when a user types, update the phrse pane
 function updatePhrasePane(message){
-  $('#phrase-pane').text(message)
-  var phrase = $('#phrase-pane').text().split(' ')
-  var parsedPhrase = phrase.map(function(word){
-    return word.replace(/[^\w\s]/gi, '')
+  //don't proceed if user is in the middle of typing a word
+  if (message.slice(-1) != ' ') {
+    return
+  }
 
+  $('#phrase-pane').html('')
+
+  var phrases = message.split(' ')
+
+  phrases.map(function(word){
+
+    if (word.slice(-1) == '$' || word.slice(-1) == '.' || word.slice(-1) == '?'){
+      word = word.slice(0, word.length - 1)
+    }
+
+    word = word.toLowerCase()
+
+
+
+    var wordButton = document.createElement('button')
+    wordButton.id = 'word-' + word
+    wordButton.className = 'btn btn-link'
+    wordButton.innerHTML = word
+
+
+    socket.emit('spelling', word, function(data){
+      console.log('spellinkg', word, data)
+      var newWord = { word: word, correct: data }
+      // if (phraseArray.indexOf(newWord) == -1)
+      //   phraseArray.push(newWord)
+      var checkInArray = phraseArray.filter(function(wordObject){
+        return wordObject.word == newWord.word
+      })
+      console.log('in array?', checkInArray)
+      if (checkInArray.length === 0){
+        phraseArray.push(newWord)
+        checkPhraseSpelling()
+      }
+
+    })
+    $('#phrase-pane').append(wordButton)
+    checkPhraseSpelling()
   })
-  console.log('phrase', phrase)
-  console.log('parsed', parsedPhrase)
-  if (parsedPhrase.length > 0)
-    socket.emit('spelling', phrase[0])
+
 }
 
+function checkPhraseSpelling(){
+  console.log('here', phraseArray)
+  phraseArray.map(function(word){
+    console.log('check work', word)
+    if (!word.correct && !$('#word-' + word.word).hasClass()) {
+      $('#word-' + word.word).removeClass('btn-link').addClass('btn-warning')
+    }
+  })
+}
+
+//
 function showDef(event){
-  var wordToMatch = event.target.innerText
+  var wordToMatch = event.currentTarget.innerText
+  console.log(wordToMatch)
   $('#search-pane').scrollTop(0)
   var positionDifference = $("#"+wordToMatch).position().top - $('#search-pane').scrollTop()
   $('#search-pane').scrollTop(positionDifference)
@@ -74,9 +123,19 @@ function createWord(wordsObject){
   var word = document.createElement('p')
   var theWord = wordsObject[0].english_search
   word.innerHTML = theWord
-  wordDiv.onclick = showDef
+  wordDiv.addEventListener('click', showDef)
   wordDiv.appendChild(word)
   return wordDiv
+}
+
+function replaceWord(event){
+  var newWord = event.currentTarget.getAttribute('maori_word')
+  var oldWord = event.currentTarget.getAttribute('english_word')
+  //get string
+  var chatPhrase = $("#m").val()
+  chatPhrase = chatPhrase.replace(oldWord+"$",newWord)
+  $('#m').val(chatPhrase)
+  updatePhrasePane(chatPhrase)
 }
 
 //creating an element for the translation and returning it
@@ -89,8 +148,11 @@ function createDefinition(wordsObject){
   wordsObject.map(function(theWord){
     var singleWordDiv = document.createElement('button')
     singleWordDiv.className = 'single-definition btn btn-default'
+    singleWordDiv.addEventListener('click', replaceWord)
     var word = document.createElement('p')
     word.innerHTML = theWord.english_search + " > " + theWord.maori_search
+    singleWordDiv.setAttribute("maori_word", theWord.maori_search.split(",")[0].trim())
+    singleWordDiv.setAttribute("english_word", theWord.english_search.split(",")[0].trim())
     singleWordDiv.appendChild(word)
     var englishSentence = document.createElement('p')
     englishSentence.innerHTML = theWord.english_sentence

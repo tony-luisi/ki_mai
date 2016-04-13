@@ -5,7 +5,18 @@ block content
     div(class='row' id='titles')
       div(class='col-md-12 jumbotron')
         h1 Welcome to Kī Mai
+        div(class='g-signin2' data-onsuccess='onSignIn')
         form(action='/')
           label(for='username') Username: 
-            input(type='text' name='username')
+          input(type='text' name='username' class='form-control')
+          button(class='btn btn-success') Login
+  script(type='text/javascript').
+    function onSignIn(googleUser) {
+      var profile = googleUser.getBasicProfile();
+      console.log('ID: ' + profile.getId());
+      console.log('Name: ' + profile.getName());
+      console.log('Image URL: ' + profile.getImageUrl());
+      console.log('Email: ' + profile.getEmail());
+    }
+
           

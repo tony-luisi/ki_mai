@@ -8,6 +8,8 @@ html
     meta(name='viewport' contents='width=device-width, initial-scale=1')
     link(rel='stylesheet', href='/stylesheets/style.css')
     link(rel='stylesheet', href='/stylesheets/animate.css')
+    script(src='https://apis.google.com/js/platform.js' async defer)
+    meta(name='google-signin-client_id' content='kimai-1280.apps.googleusercontent.com')
   body
     nav.navbar.navbar-default.navbar-fixed-top
       .container-fluid
@@ -27,24 +29,24 @@ html
           #bs-example-navbar-collapse-1.collapse.navbar-collapse
             ul.nav.navbar-nav
               li
-                a(href='#')
+                a(href='/users')
                   | Connect 
                   span.sr-only (current)
               |         
               li
-                a(href='#') Chat
+                a(href='/') Chat
               |         
               li.dropdown
                 a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-                  | Learn 
+                  | User 
                   span.caret
                 |           
                 ul.dropdown-menu
                   li
-                    a(href='#') Action
+                    a(href='#') Take Test
                   |             
                   li
-                    a(href='#') Another action
+                    a(href='#') Settings
                   |             
                   li
                     a(href='#') Something else here
