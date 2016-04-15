@@ -1,39 +1,14 @@
-var $ = require('jquery')
-var socket = io.connect('http://localhost:3000');
 var wordArray = []
 var definitionArray = []
 var phraseArray = []
+var input = require('./input')
 
-//when the user enters a message into the chat window
 $('form').submit(function(){
-  var user = $('#username').text()
-  var message = user + ": " + $('#m').val()
-  if (message !== '') {
-    socket.emit('message', { message: message })
-  }
-  $('#m').val('');
+  input.submitChatMessage()
   return false
 })
 
-//when a user receives a chat message into the chat window
-socket.on('message', function (data) {
-  $('#messages').append($('<li class="animated fadeInUp">').text(data.message))
-  var element = document.getElementById('message-pane')
-  element.scrollTop += 100
-})
 
-//when receiving a translated message
-socket.on('translate', function(data) {
-    if (data.length > 0){
-    var definition = createDefinition(data)
-    var word = createWord(data)
-    $('#search-pane').append(definition)
-    $('#word-list').append(word)
-    definitionArray.push(definition)
-    var element = document.getElementById('search-pane')
-    element.scrollTop += 1000
-  }
-})
 
 //when a user types a key in the chat - and wants a word to be translated
 $('#m').on('keyup', function() {
@@ -45,7 +20,7 @@ $('#m').on('keyup', function() {
     word = word.toLowerCase()
     if (word.endsWith('$') && wordArray.indexOf(word) === -1) {
       wordArray.push(word)
-      socket.emit('translate', { text: word })
+      //socket.emit('translate', { text: word })
     }
   })
 })
@@ -77,21 +52,21 @@ function updatePhrasePane(message){
     wordButton.innerHTML = word
 
 
-    socket.emit('spelling', word, function(data){
-      console.log('spellinkg', word, data)
-      var newWord = { word: word, correct: data }
-      // if (phraseArray.indexOf(newWord) == -1)
-      //   phraseArray.push(newWord)
-      var checkInArray = phraseArray.filter(function(wordObject){
-        return wordObject.word == newWord.word
-      })
-      console.log('in array?', checkInArray)
-      if (checkInArray.length === 0){
-        phraseArray.push(newWord)
-        checkPhraseSpelling()
-      }
+    // socket.emit('spelling', word, function(data){
+    //   console.log('spellinkg', word, data)
+    //   var newWord = { word: word, correct: data }
+    //   // if (phraseArray.indexOf(newWord) == -1)
+    //   //   phraseArray.push(newWord)
+    //   var checkInArray = phraseArray.filter(function(wordObject){
+    //     return wordObject.word == newWord.word
+    //   })
+    //   console.log('in array?', checkInArray)
+    //   if (checkInArray.length === 0){
+    //     phraseArray.push(newWord)
+    //     checkPhraseSpelling()
+    //   }
 
-    })
+    // })
     $('#phrase-pane').append(wordButton)
     checkPhraseSpelling()
   })

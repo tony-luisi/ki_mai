@@ -1,0 +1,9 @@
+function checkSpelling(){
+  
+}
+
+
+
+module.exports = {
+
+}
