@@ -29,10 +29,10 @@ module.exports = function(io) {
       io.emit('message', message)
     })
 
-    socket.on('translate', function(word){
+    socket.on('translate', function(word, callback){
       console.log('need to translate word', word)
       var translatedWord = english.getWord(word.text.substring(0,word.text.length-1))
-      socket.emit('translate', translatedWord)
+      callback(translatedWord)
     })
 
     socket.on('spelling', function(word, callback){

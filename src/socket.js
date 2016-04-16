@@ -6,9 +6,17 @@ function sendMessage(message){
   socket.emit('message', message)
 }
 
+function sendSpellcheck(message, callback){
+  socket.emit('spelling', message, function(data){
+    callback(data)
+  })
+}
 
-
-
+function sendTranslate(message, callback){
+  socket.emit('translate', { text: message }, function(data){
+    callback(data)
+  })
+}
 
 ////// message receivers
 
@@ -17,20 +25,14 @@ socket.on('message', function (data) {
 })
 
 
-//when receiving a translated message
-socket.on('translate', function(data) {
-  if (data.length > 0){
-    var definition = createDefinition(data)
-    var word = createWord(data)
-    $('#search-pane').append(definition)
-    $('#word-list').append(word)
-    definitionArray.push(definition)
-    var element = document.getElementById('search-pane')
-    element.scrollTop += 1000
-  }
-})
+// //when receiving a translated message
+// socket.on('translate', function(data) {
+//   translate.addTranslation(data)
+// })
 
 
 module.exports = {
-  sendMessage: sendMessage
+  sendMessage: sendMessage,
+  sendSpellcheck: sendSpellcheck,
+  sendTranslate: sendTranslate
 }

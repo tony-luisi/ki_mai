@@ -10,119 +10,214 @@ module.exports = {
 }
 
 },{}],2:[function(require,module,exports){
-var wordArray = []
-var definitionArray = []
-var phraseArray = []
 var input = require('./input')
+var phrase = require('./phrase')
+var translate = require('./translate')
 
 $('form').submit(function(){
   input.submitChatMessage()
+  phrase.clear()
   return false
 })
 
-
-
 //when a user types a key in the chat - and wants a word to be translated
 $('#m').on('keyup', function() {
-  checkPhraseSpelling()
-  var message = $('#m').val()
-  updatePhrasePane(message)
-  message = message.split(' ')
-  message.map(function(word){
-    word = word.toLowerCase()
-    if (word.endsWith('$') && wordArray.indexOf(word) === -1) {
-      wordArray.push(word)
-      //socket.emit('translate', { text: word })
-    }
-  })
+  var message = input.getChatMessage()
+  phrase.update(message)
+  translate.update(message)
 })
 
-//when a user types, update the phrse pane
-function updatePhrasePane(message){
-  //don't proceed if user is in the middle of typing a word
-  if (message.slice(-1) != ' ') {
-    return
-  }
+//
 
-  $('#phrase-pane').html('')
+},{"./input":3,"./phrase":4,"./translate":6}],3:[function(require,module,exports){
+var socket = require('./socket')
 
-  var phrases = message.split(' ')
-
-  phrases.map(function(word){
-
-    if (word.slice(-1) == '$' || word.slice(-1) == '.' || word.slice(-1) == '?'){
-      word = word.slice(0, word.length - 1)
-    }
-
-    word = word.toLowerCase()
-
-
-
-    var wordButton = document.createElement('button')
-    wordButton.id = 'word-' + word
-    wordButton.className = 'btn btn-link'
-    wordButton.innerHTML = word
-
-
-    // socket.emit('spelling', word, function(data){
-    //   console.log('spellinkg', word, data)
-    //   var newWord = { word: word, correct: data }
-    //   // if (phraseArray.indexOf(newWord) == -1)
-    //   //   phraseArray.push(newWord)
-    //   var checkInArray = phraseArray.filter(function(wordObject){
-    //     return wordObject.word == newWord.word
-    //   })
-    //   console.log('in array?', checkInArray)
-    //   if (checkInArray.length === 0){
-    //     phraseArray.push(newWord)
-    //     checkPhraseSpelling()
-    //   }
-
-    // })
-    $('#phrase-pane').append(wordButton)
-    checkPhraseSpelling()
-  })
-
+//when the user enters a message into the chat window
+function submitChatMessage(){
+  console.log('here')
+  var message = $('#m').val()
+  var username = $('#username').text()
+  if (message !== '') socket.sendMessage({ from: username, message: message })
+  $('#m').val('')
 }
 
-function checkPhraseSpelling(){
-  console.log('here', phraseArray)
-  phraseArray.map(function(word){
-    console.log('check work', word)
+function getChatMessage(){
+  return $('#m').val()
+}
+
+module.exports = {
+  submitChatMessage: submitChatMessage,
+  getChatMessage: getChatMessage
+}
+
+},{"./socket":5}],4:[function(require,module,exports){
+var wordsArray = []
+var spellchecked = []
+//var symbol_lookup = ['$', '.', '?', ',']
+var socket = require('./socket')
+
+function renderSpelling(){
+  spellchecked.map(function(word){
     if (!word.correct && !$('#word-' + word.word).hasClass()) {
       $('#word-' + word.word).removeClass('btn-link').addClass('btn-warning')
     }
   })
 }
 
-//
-function showDef(event){
-  var wordToMatch = event.currentTarget.innerText
-  console.log(wordToMatch)
-  $('#search-pane').scrollTop(0)
-  var positionDifference = $("#"+wordToMatch).position().top - $('#search-pane').scrollTop()
-  $('#search-pane').scrollTop(positionDifference)
+function getSpellchecked(word){
+  var spellcheckarray = spellchecked.filter(function(spellObject){
+    return (spellObject.word === word)
+  })
+  return spellcheckarray[0]
 }
 
-function createWord(wordsObject){
-  var wordDiv = document.createElement('button')
-  wordDiv.className = 'word btn btn-default'
-  var word = document.createElement('p')
-  var theWord = wordsObject[0].english_search
-  word.innerHTML = theWord
-  wordDiv.addEventListener('click', showDef)
-  wordDiv.appendChild(word)
-  return wordDiv
+function isSpellchecked(word){
+  var spellcheckedWord = false
+  spellchecked.map(function(spellObject){
+    if (spellObject.word === word) {
+      spellcheckedWord = true
+    }
+  })
+  return spellcheckedWord
 }
 
-function replaceWord(event){
-  var newWord = event.currentTarget.getAttribute('maori_word')
-  var oldWord = event.currentTarget.getAttribute('english_word')
-  //get string
-  var chatPhrase = $("#m").val()
-  chatPhrase = chatPhrase.replace(oldWord+"$",newWord)
-  $('#m').val(chatPhrase)
-  updatePhrasePane(chatPhrase)
+function renderPhrase(words){
+  $('#phrase-pane').html('')
+  words.map(function(word){
+    word = filter(word)
+    word = word.toLowerCase()
+    var wordButton = document.createElement('button')
+    wordButton.id = 'word-' + word
+    wordButton.className = getClass(word)
+    wordButton.innerHTML = word
+    $('#phrase-pane').append(wordButton)
+  })
+}
+
+function getClass(word) {
+  if (isSpellchecked(word)){
+    var wordObject = getSpellchecked(word)
+    if (wordObject.correct){
+      return 'btn btn-link'
+    } else {
+       return 'btn btn-warning'
+    }
+  } else {
+    return 'btn btn-link'
+  }
+}
+
+function checkSpelling(word){
+  socket.sendSpellcheck(word, function(data){
+    spellchecked.push({ word: word, correct: data })
+    renderSpelling()
+  })
+}
+
+function filter(word){
+  if (word.slice(-1) == '$' || word.slice(-1) == '.' || word.slice(-1) == '?'){
+      word = word.slice(0, word.length - 1)
+  }
+  return word
+}
+
+function clear(){
+  $('#phrase-pane').html('')
+}
+
+function update(message){
+  renderSpelling()
+  // if (message.slice(-1) != ' ') {
+  //   return
+  // }
+  var words = message.split(' ')
+  renderPhrase(words)
+  var newWords = words.filter(function(word){
+    return wordsArray.indexOf(word) === -1
+  })
+  newWords.map(function(word){
+    word = filter(word)
+    wordsArray.push(word)
+    checkSpelling(word)
+  })
+}
+
+module.exports = {
+  checkSpelling: checkSpelling,
+  update: update,
+  clear: clear//,
+  //renderSpelling: renderSpelling
+}
+
+},{"./socket":5}],5:[function(require,module,exports){
+var socket = io.connect('http://localhost:3000');
+var chat = require('./chat')
+/////// message senders
+
+function sendMessage(message){
+  socket.emit('message', message)
+}
+
+function sendSpellcheck(message, callback){
+  socket.emit('spelling', message, function(data){
+    callback(data)
+  })
+}
+
+function sendTranslate(message, callback){
+  socket.emit('translate', { text: message }, function(data){
+    callback(data)
+  })
+}
+
+////// message receivers
+
+socket.on('message', function (data) {
+  chat.addMessage(data)
+})
+
+
+// //when receiving a translated message
+// socket.on('translate', function(data) {
+//   translate.addTranslation(data)
+// })
+
+
+module.exports = {
+  sendMessage: sendMessage,
+  sendSpellcheck: sendSpellcheck,
+  sendTranslate: sendTranslate
+}
+
+},{"./chat":1}],6:[function(require,module,exports){
+var socket = require('./socket')
+var phrase = require('./phrase')
+var wordsArray = []
+var translatedWords = []
+var definitionArray = []
+
+function update(message){
+  message = message.split(' ')
+  message.map(function(word){
+    word = word.toLowerCase()
+    if (word.endsWith('$') && wordsArray.indexOf(word) === -1) {
+      wordsArray.push(word)
+      socket.sendTranslate(word, addTranslation)
+    }
+  })
+}
+
+function addTranslation(data){
+  console.log('data', data)
+  if (data.length > 0){
+    var definition = createDefinition(data)
+    var word = createWord(data)
+    $('#search-pane').append(definition)
+    $('#word-list').append(word)
+    definitionArray.push(definition)
+    var element = document.getElementById('search-pane')
+    element.scrollTop += 1000
+  }
 }
 
 //creating an element for the translation and returning it
@@ -152,63 +247,36 @@ function createDefinition(wordsObject){
   return definitionDiv
 }
 
-},{"./input":3}],3:[function(require,module,exports){
-var socket = require('./socket')
-
-//when the user enters a message into the chat window
-function submitChatMessage(){
-  console.log('here')
-  var message = $('#m').val()
-  var username = $('#username').text()
-  if (message !== '') socket.sendMessage({ from: username, message: message })
-  $('#m').val('')
+function replaceWord(event){
+  var newWord = event.currentTarget.getAttribute('maori_word')
+  var oldWord = event.currentTarget.getAttribute('english_word')
+  //get string
+  var chatPhrase = $("#m").val()
+  chatPhrase = chatPhrase.replace(oldWord+"$",newWord)
+  $('#m').val(chatPhrase)
+  phrase.update($('#m').val())
+}
+function showDef(event){
+  var wordToMatch = event.currentTarget.innerText
+  $('#search-pane').scrollTop(0)
+  var positionDifference = $("#"+wordToMatch).position().top - $('#search-pane').scrollTop()
+  $('#search-pane').scrollTop(positionDifference)
 }
 
-function getChatMessage(){
-  return $('#m').val()
+function createWord(wordsObject){
+  var wordDiv = document.createElement('button')
+  wordDiv.className = 'word btn btn-default'
+  var word = document.createElement('p')
+  var theWord = wordsObject[0].english_search
+  word.innerHTML = theWord
+  wordDiv.addEventListener('click', showDef)
+  wordDiv.appendChild(word)
+  return wordDiv
 }
-
-module.exports = {
-  submitChatMessage: submitChatMessage,
-  getChatMessage: getChatMessage
-}
-
-},{"./socket":4}],4:[function(require,module,exports){
-var socket = io.connect('http://localhost:3000');
-var chat = require('./chat')
-/////// message senders
-
-function sendMessage(message){
-  socket.emit('message', message)
-}
-
-
-
-
-
-////// message receivers
-
-socket.on('message', function (data) {
-  chat.addMessage(data)
-})
-
-
-//when receiving a translated message
-socket.on('translate', function(data) {
-  if (data.length > 0){
-    var definition = createDefinition(data)
-    var word = createWord(data)
-    $('#search-pane').append(definition)
-    $('#word-list').append(word)
-    definitionArray.push(definition)
-    var element = document.getElementById('search-pane')
-    element.scrollTop += 1000
-  }
-})
 
 
 module.exports = {
-  sendMessage: sendMessage
+  update: update
 }
 
-},{"./chat":1}]},{},[2]);
+},{"./phrase":4,"./socket":5}]},{},[2]);
