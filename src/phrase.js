@@ -2,6 +2,7 @@ var wordsArray = []
 var spellchecked = []
 //var symbol_lookup = ['$', '.', '?', ',']
 var socket = require('./socket')
+var translate = require('./translate')
 
 function renderSpelling(){
   spellchecked.map(function(word){
@@ -28,6 +29,16 @@ function isSpellchecked(word){
   return spellcheckedWord
 }
 
+function getDef(event){
+  var word = event.currentTarget.innerHTML
+  console.log('sending', word)
+  socket.sendDefinition(word, function(err, res){
+    if (res.length > 0) {
+      translate.addLookup(word, res)
+    }
+  })
+}
+
 function renderPhrase(words){
   $('#phrase-pane').html('')
   words.map(function(word){
@@ -37,6 +48,7 @@ function renderPhrase(words){
     wordButton.id = 'word-' + word
     wordButton.className = getClass(word)
     wordButton.innerHTML = word
+    wordButton.addEventListener('click', getDef)
     $('#phrase-pane').append(wordButton)
   })
 }

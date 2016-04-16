@@ -1,5 +1,6 @@
 var socket = require('./socket')
 var phrase = require('./phrase')
+var input = require('./input')
 var wordsArray = []
 var translatedWords = []
 var definitionArray = []
@@ -14,6 +15,56 @@ function update(message){
     }
   })
 }
+
+function addLookup(word, lookupArray){
+  console.log('lookup', lookupArray)
+  var wordDiv = createWord(null, word)
+  $('#word-list').append(wordDiv)
+  var lookupDiv = createLookup(word, lookupArray)
+  console.log(lookupDiv)
+  $('#search-pane').append(lookupDiv)
+}
+
+function createLookup(lookupWord, lookupArray){
+  var definitionDiv = document.createElement('div')
+  definitionDiv.className = 'overall-definition animated fadeIn'
+  definitionDiv.id = 'lookup-'+lookupWord
+
+  lookupArray.map(function(theWord){
+    var singleWordDiv = document.createElement('button')
+    singleWordDiv.className = 'single-definition btn btn-default'
+    singleWordDiv.addEventListener('click', replaceLookup)
+
+    var word = document.createElement('p')
+    word.innerHTML = lookupWord + " > " + theWord.title
+
+
+    singleWordDiv.setAttribute("from_word", lookupWord)
+    singleWordDiv.setAttribute("to_word", theWord.title)
+
+    singleWordDiv.appendChild(word)
+
+    theWord.details.map(function(detail){
+      var englishSentence = document.createElement('div')
+      englishSentence.innerHTML = detail
+      singleWordDiv.appendChild(englishSentence)
+    })
+    definitionDiv.appendChild(singleWordDiv)
+  })
+  return definitionDiv
+}
+
+function replaceLookup(event){
+  console.log(event.currentTarget)
+  var newWord = event.currentTarget.getAttribute('to_word')
+  var oldWord = event.currentTarget.getAttribute('from_word')
+  // //get string
+  var chatPhrase = $("#m").val()
+  chatPhrase = chatPhrase.replace(oldWord,newWord)
+  $("#m").val(chatPhrase)
+}
+
+
 
 function addTranslation(data){
   console.log('data', data)
@@ -62,7 +113,7 @@ function replaceWord(event){
   var chatPhrase = $("#m").val()
   chatPhrase = chatPhrase.replace(oldWord+"$",newWord)
   $('#m').val(chatPhrase)
-  phrase.update($('#m').val())
+  //phrase.update($('#m').val())
 }
 function showDef(event){
   var wordToMatch = event.currentTarget.innerText
@@ -71,11 +122,12 @@ function showDef(event){
   $('#search-pane').scrollTop(positionDifference)
 }
 
-function createWord(wordsObject){
+function createWord(wordsObject, theWord){
   var wordDiv = document.createElement('button')
   wordDiv.className = 'word btn btn-default'
   var word = document.createElement('p')
-  var theWord = wordsObject[0].english_search
+  if (wordsObject)
+    var theWord = wordsObject[0].english_search
   word.innerHTML = theWord
   wordDiv.addEventListener('click', showDef)
   wordDiv.appendChild(word)
@@ -84,5 +136,6 @@ function createWord(wordsObject){
 
 
 module.exports = {
-  update: update
+  update: update,
+  addLookup: addLookup
 }

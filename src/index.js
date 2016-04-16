@@ -1,6 +1,8 @@
 var input = require('./input')
 var phrase = require('./phrase')
 var translate = require('./translate')
+var spelling = require('./spelling')
+
 
 $('form').submit(function(){
   input.submitChatMessage()
@@ -15,4 +17,9 @@ $('#m').on('keyup', function() {
   translate.update(message)
 })
 
-//
+
+$('#sendbutton').click(function(){
+  input.submitChatMessage()
+  phrase.clear()
+  return false
+})

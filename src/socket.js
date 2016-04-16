@@ -1,7 +1,7 @@
 var socket = io.connect('/');
 var chat = require('./chat')
-/////// message senders
 
+/////// message senders
 function sendMessage(message){
   socket.emit('message', message)
 }
@@ -18,21 +18,25 @@ function sendTranslate(message, callback){
   })
 }
 
-////// message receivers
+function sendDefinition(message, callback){
+  socket.emit('definition', message, function(err, res){
+    console.log('received:', res)
+    if (err) {
+      callback(err)
+      return
+    }
+    callback(null, res)
+  })
+}
 
+////// message receivers
 socket.on('message', function (data) {
   chat.addMessage(data)
 })
 
-
-// //when receiving a translated message
-// socket.on('translate', function(data) {
-//   translate.addTranslation(data)
-// })
-
-
 module.exports = {
   sendMessage: sendMessage,
   sendSpellcheck: sendSpellcheck,
-  sendTranslate: sendTranslate
+  sendTranslate: sendTranslate,
+  sendDefinition: sendDefinition
 }
