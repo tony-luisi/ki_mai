@@ -70,6 +70,16 @@
 	  return false;
 	});
 
+	// $('#word-list').click(function(e){
+	//   var word = e.currentTarget.innerHTML
+	//   console.log(word)
+	// })
+
+	$('#search-pane').click(function () {
+	  var message = input.getChatMessage();
+	  phrase.update(message);
+	});
+
 /***/ },
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
@@ -206,6 +216,7 @@
 	function getDef(event) {
 	  var word = event.currentTarget.innerHTML;
 	  console.log('sending', word);
+	  // translate.update(word + "$")
 	  socket.sendDefinition(word, function (err, res) {
 	    if (res.length > 0) {
 	      translate.addLookup(word, res);
@@ -289,7 +300,6 @@
 	'use strict';
 
 	var socket = __webpack_require__(2);
-	var phrase = __webpack_require__(4);
 	var input = __webpack_require__(1);
 	var wordsArray = [];
 	var translatedWords = [];
@@ -311,6 +321,7 @@
 	  var wordDiv = createWord(null, word);
 	  $('#word-list').append(wordDiv);
 	  var lookupDiv = createLookup(word, lookupArray);
+	  definitionArray.push({ word: word, definition: lookupDiv });
 	  console.log(lookupDiv);
 	  $('#search-pane').append(lookupDiv);
 	}
@@ -400,13 +411,24 @@
 	  var chatPhrase = $("#m").val();
 	  chatPhrase = chatPhrase.replace(oldWord + "$", newWord);
 	  $('#m').val(chatPhrase);
-	  //phrase.update($('#m').val())
 	}
 	function showDef(event) {
-	  var wordToMatch = event.currentTarget.innerText;
-	  $('#search-pane').scrollTop(0);
-	  var positionDifference = $("#" + wordToMatch).position().top - $('#search-pane').scrollTop();
-	  $('#search-pane').scrollTop(positionDifference);
+	  var wordToMatch = event.currentTarget.innerText.trim();
+	  //$('#search-pane').scrollTop(0)
+	  //var positionDifference = $("#"+wordToMatch).position().top - $('#search-pane').scrollTop()
+	  //$('#search-pane').scrollTop(positionDifference)
+	  //$('#search-pane').append(definition)
+	  //console.log(definitionArray)
+
+	  definitionArray.map(function (definition) {
+	    console.log("MATCH", wordToMatch, 'word', definition.word);
+	    console.log('match?', wordToMatch == definition.word);
+	    if (definition.word == wordToMatch) {
+
+	      $('#search-pane').text('');
+	      $('#search-pane').append(definition.definition);
+	    }
+	  });
 	}
 
 	function createWord(wordsObject, theWord) {

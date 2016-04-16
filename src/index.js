@@ -23,3 +23,13 @@ $('#sendbutton').click(function(){
   phrase.clear()
   return false
 })
+
+// $('#word-list').click(function(e){
+//   var word = e.currentTarget.innerHTML
+//   console.log(word)
+// })
+
+$('#search-pane').click(function(){
+  var message = input.getChatMessage()
+  phrase.update(message)
+})

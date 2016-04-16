@@ -11,6 +11,9 @@ a {
   border-width: thick;
   overflow-y: scroll; }
 
+.navbar-brand {
+  content: url("/images/kimai.png"); }
+
 #word-list {
   height: 30em;
   width: 100%;

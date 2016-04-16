@@ -1,5 +1,4 @@
 var socket = require('./socket')
-var phrase = require('./phrase')
 var input = require('./input')
 var wordsArray = []
 var translatedWords = []
@@ -21,6 +20,7 @@ function addLookup(word, lookupArray){
   var wordDiv = createWord(null, word)
   $('#word-list').append(wordDiv)
   var lookupDiv = createLookup(word, lookupArray)
+  definitionArray.push({ word: word, definition: lookupDiv})
   console.log(lookupDiv)
   $('#search-pane').append(lookupDiv)
 }
@@ -113,13 +113,24 @@ function replaceWord(event){
   var chatPhrase = $("#m").val()
   chatPhrase = chatPhrase.replace(oldWord+"$",newWord)
   $('#m').val(chatPhrase)
-  //phrase.update($('#m').val())
 }
 function showDef(event){
-  var wordToMatch = event.currentTarget.innerText
-  $('#search-pane').scrollTop(0)
-  var positionDifference = $("#"+wordToMatch).position().top - $('#search-pane').scrollTop()
-  $('#search-pane').scrollTop(positionDifference)
+  var wordToMatch = event.currentTarget.innerText.trim()
+  //$('#search-pane').scrollTop(0)
+  //var positionDifference = $("#"+wordToMatch).position().top - $('#search-pane').scrollTop()
+  //$('#search-pane').scrollTop(positionDifference)
+  //$('#search-pane').append(definition)
+  //console.log(definitionArray)
+
+  definitionArray.map(function(definition){
+    console.log("MATCH", wordToMatch, 'word', definition.word)
+    console.log('match?', wordToMatch == definition.word)
+    if (definition.word == wordToMatch){
+
+      $('#search-pane').text('')
+      $('#search-pane').append(definition.definition)
+    }
+  })
 }
 
 function createWord(wordsObject, theWord){

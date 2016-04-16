@@ -32,6 +32,7 @@ function isSpellchecked(word){
 function getDef(event){
   var word = event.currentTarget.innerHTML
   console.log('sending', word)
+  // translate.update(word + "$")
   socket.sendDefinition(word, function(err, res){
     if (res.length > 0) {
       translate.addLookup(word, res)
