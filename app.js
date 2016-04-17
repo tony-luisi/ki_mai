@@ -37,9 +37,13 @@ app.use(require('node-sass-middleware')({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
+    // genid: function(req) {
+    //   return genuuid() // use UUIDs for session IDs
+    // },
     secret: 'keyboard cat',
     cookie: {
-        maxAge: 30000 // 2 seconds for testing
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 2 seconds for testing
+
     },
     store: store
 }))
