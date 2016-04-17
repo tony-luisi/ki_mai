@@ -20,11 +20,26 @@ module.exports = function(io) {
 
   router.get('/', function(req, res, next) {
     console.log(req.session)
+
     var username = req.query.username || 'user'
     username = username.charAt(0).toUpperCase() + username.substring(1)
     console.log(username)
     res.render('index', { title: 'Ki Mai', name: username });
   });
+
+  router.post('/word', function(req, res, next) {
+    console.log('req', req.body)
+    console.log('googleid', req.body.googleid)
+    db.getUserIDByGoogleID(req.body.googleid).then(function(result){
+      console.log('result', result[0].id)
+      db.addWord(req.body.word, result[0].id).then(function(result){
+        console.log('result of words', result)
+        res.send('success')
+      })
+
+    })
+
+  })
 
   io.on('connection', function(socket) {
     socket.on('message', function(message){

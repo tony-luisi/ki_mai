@@ -1,3 +1,4 @@
+var basicProfile
 
 function startApp(){
   console.log('loaded')
@@ -11,9 +12,10 @@ function loaded(){
   var auth2 = gapi.auth2.getAuthInstance()
   console.log('singed in', auth2.isSignedIn.get())
   var user = auth2.currentUser.get()
-  var basicProfile = user.getBasicProfile()
+  basicProfile = user.getBasicProfile()
   $('#username').text(basicProfile.getName())
-
+  console.log(basicProfile.getId())
+  $('#googleid').text(basicProfile.getId())
   // var xhr = new XMLHttpRequest();
   // xhr.open('POST', '/');
   // xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');

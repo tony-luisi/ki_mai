@@ -1,5 +1,6 @@
 var socket = require('./socket')
 var input = require('./input')
+var render = require('./render')
 var wordsArray = []
 var translatedWords = []
 var definitionArray = []
@@ -17,7 +18,8 @@ function update(message){
 
 function addLookup(word, lookupArray){
   console.log('lookup', lookupArray)
-  var wordDiv = createWord(null, word)
+  var wordDiv = render.createWord(null, word)
+  wordDiv.addEventListener('click', showDef)
   $('#word-list').append(wordDiv)
   var lookupDiv = createLookup(word, lookupArray)
   definitionArray.push({ word: word, definition: lookupDiv})
@@ -70,7 +72,8 @@ function addTranslation(data){
   console.log('data', data)
   if (data.length > 0){
     var definition = createDefinition(data)
-    var word = createWord(data)
+    var word = render.createWord(data)
+    word.addEventListener('click', showDef)
     $('#search-pane').append(definition)
     $('#word-list').append(word)
     definitionArray.push(definition)
@@ -130,17 +133,7 @@ function showDef(event){
   })
 }
 
-function createWord(wordsObject, theWord){
-  var wordDiv = document.createElement('button')
-  wordDiv.className = 'word btn btn-default'
-  var word = document.createElement('p')
-  if (wordsObject)
-    var theWord = wordsObject[0].english_search
-  word.innerHTML = theWord
-  wordDiv.addEventListener('click', showDef)
-  wordDiv.appendChild(word)
-  return wordDiv
-}
+
 
 
 module.exports = {

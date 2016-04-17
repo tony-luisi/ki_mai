@@ -37,6 +37,14 @@ function getDef(event){
     if (res.length > 0) {
       translate.addLookup(word, res)
     }
+    $.ajax({
+      method: "POST",
+      url: "/word",
+      data: { word: word, googleid: $('#googleid').text() }
+    })
+    .done(function( msg ) {
+      //alert( "Data Saved: " + msg );
+    });
   })
 }
 

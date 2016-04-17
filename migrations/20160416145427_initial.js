@@ -4,6 +4,7 @@ exports.up = function(knex, Promise) {
     table.increments()
     table.string('username')
     table.string('fullname')
+    table.string('google_id')
     table.string('email')
     table.string('password_salt')
     table.string('password')

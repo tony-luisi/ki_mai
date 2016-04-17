@@ -15,6 +15,12 @@ router.get('/all', function(req, res, next){
   })
 })
 
+router.get('/words', function(req, res, next){
+  db.allWords().then(function(result){
+    res.send(result)
+  })
+})
+
 router.get('/session', function(req, res, next){
   var sess = req.session
   if (sess.views) {

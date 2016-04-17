@@ -79,6 +79,52 @@
 	  phrase.update(message);
 	});
 
+	function hasGetUserMedia() {
+	  return !!(navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
+	}
+
+	if (hasGetUserMedia()) {
+	  console.log('success');
+
+	  navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+	  window.AudioContext = window.AudioContext || window.webkitAudioContext;
+
+	  var context = new AudioContext();
+
+	  var audio = document.querySelector('audio');
+
+	  if (navigator.getUserMedia) {
+
+	    navigator.getUserMedia({ audio: true }, function (stream) {
+	      var microphone = context.createMediaStreamSource(stream);
+	      var filter = context.createBiquadFilter();
+
+	      // microphone -> filter -> destination.
+	      microphone.connect(filter);
+	      filter.connect(context.destination);
+	    }, function (error) {
+	      console.log(error);
+	    });
+	  }
+	} else {
+	  alert('getUserMedia() is not supported in your browser');
+	}
+
+	// navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+	//   .then(function(mediaStream){
+	//     //var audio = document.querySelector('#audio');
+	//     // video.src = window.URL.createObjectURL(mediaStream);
+	//     // video.onloadedmetadata = function(e) {
+	//     //
+	//     // }
+	//     // Do something with the video here.
+	//     console.log(mediaStream)
+	//   })
+	//   .catch(function(error) {
+	//     console.log(error)
+	//   })
+
 /***/ },
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
@@ -222,6 +268,13 @@
 	    if (res.length > 0) {
 	      translate.addLookup(word, res);
 	    }
+	    $.ajax({
+	      method: "POST",
+	      url: "/word",
+	      data: { word: word, googleid: $('#googleid').text() }
+	    }).done(function (msg) {
+	      //alert( "Data Saved: " + msg );
+	    });
 	  });
 	}
 
@@ -302,6 +355,7 @@
 
 	var socket = __webpack_require__(2);
 	var input = __webpack_require__(1);
+	var render = __webpack_require__(13);
 	var wordsArray = [];
 	var translatedWords = [];
 	var definitionArray = [];
@@ -319,7 +373,8 @@
 
 	function addLookup(word, lookupArray) {
 	  console.log('lookup', lookupArray);
-	  var wordDiv = createWord(null, word);
+	  var wordDiv = render.createWord(null, word);
+	  wordDiv.addEventListener('click', showDef);
 	  $('#word-list').append(wordDiv);
 	  var lookupDiv = createLookup(word, lookupArray);
 	  definitionArray.push({ word: word, definition: lookupDiv });
@@ -369,7 +424,8 @@
 	  console.log('data', data);
 	  if (data.length > 0) {
 	    var definition = createDefinition(data);
-	    var word = createWord(data);
+	    var word = render.createWord(data);
+	    word.addEventListener('click', showDef);
 	    $('#search-pane').append(definition);
 	    $('#word-list').append(word);
 	    definitionArray.push(definition);
@@ -427,17 +483,6 @@
 	      $('#search-pane').append(definition.definition);
 	    }
 	  });
-	}
-
-	function createWord(wordsObject, theWord) {
-	  var wordDiv = document.createElement('button');
-	  wordDiv.className = 'word btn btn-default';
-	  var word = document.createElement('p');
-	  if (wordsObject) var theWord = wordsObject[0].english_search;
-	  word.innerHTML = theWord;
-	  wordDiv.addEventListener('click', showDef);
-	  wordDiv.appendChild(word);
-	  return wordDiv;
 	}
 
 	module.exports = {
@@ -1975,6 +2020,27 @@
 
 	module.exports = request;
 
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	function createWord(wordsObject, theWord) {
+	  var wordDiv = document.createElement('button');
+	  wordDiv.className = 'word btn btn-default';
+	  var word = document.createElement('p');
+	  if (wordsObject) var theWord = wordsObject[0].english_search;
+	  word.innerHTML = theWord;
+	  wordDiv.appendChild(word);
+	  return wordDiv;
+	}
+
+	module.exports = {
+	  createWord: createWord
+
+	};
 
 /***/ }
 /******/ ]);
