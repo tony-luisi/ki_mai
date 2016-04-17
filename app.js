@@ -12,7 +12,8 @@ var users = require('./routes/users');
 var app = express();
 
 var session = require('express-session');
-
+var KnexSessionStore = require('connect-session-knex')(session)
+var store = new KnexSessionStore()
 // var RedisStore = require('connect-redis')(session);
 
 var io = socket_io()
@@ -35,6 +36,13 @@ app.use(require('node-sass-middleware')({
   sourceMap: true
 }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({
+    secret: 'keyboard cat',
+    cookie: {
+        maxAge: 30000 // 2 seconds for testing
+    },
+    store: store
+}))
 // app.use(session({
 //     store: new RedisStore(options),
 //     secret: 'abcdefghik123'
