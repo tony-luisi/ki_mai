@@ -15,4 +15,8 @@ router.get('/all', function(req, res, next){
   })
 })
 
+router.get('/session', function(req, res, next){
+  res.send(req.session)
+})
+
 module.exports = router;
