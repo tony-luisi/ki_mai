@@ -11,6 +11,10 @@ var users = require('./routes/users');
 
 var app = express();
 
+var session = require('express-session');
+
+// var RedisStore = require('connect-redis')(session);
+
 var io = socket_io()
 app.io = io
 var routes = require('./routes/index')(io);
@@ -31,11 +35,11 @@ app.use(require('node-sass-middleware')({
   sourceMap: true
 }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
+// app.use(session({
+//     store: new RedisStore(options),
+//     secret: 'abcdefghik123'
+// }));
+
 
 app.use('/', routes);
 app.use('/users', users);

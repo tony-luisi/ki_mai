@@ -5,7 +5,9 @@ var spelling = require('./spelling')
 
 
 $('form').submit(function(){
-  input.submitChatMessage()
+  var auth2 = gapi.auth2.getAuthInstance()
+  var user = auth2.currentUser.get()
+  input.submitChatMessage(user)
   phrase.clear()
   return false
 })
@@ -19,15 +21,12 @@ $('#m').on('keyup', function() {
 
 
 $('#sendbutton').click(function(){
-  input.submitChatMessage()
+  var auth2 = gapi.auth2.getAuthInstance()
+  var user = auth2.currentUser.get()
+  input.submitChatMessage(user)
   phrase.clear()
   return false
 })
-
-// $('#word-list').click(function(e){
-//   var word = e.currentTarget.innerHTML
-//   console.log(word)
-// })
 
 $('#search-pane').click(function(){
   var message = input.getChatMessage()

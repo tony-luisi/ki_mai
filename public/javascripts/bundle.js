@@ -52,7 +52,9 @@
 	var spelling = __webpack_require__(6);
 
 	$('form').submit(function () {
-	  input.submitChatMessage();
+	  var auth2 = gapi.auth2.getAuthInstance();
+	  var user = auth2.currentUser.get();
+	  input.submitChatMessage(user);
 	  phrase.clear();
 	  return false;
 	});
@@ -65,15 +67,12 @@
 	});
 
 	$('#sendbutton').click(function () {
-	  input.submitChatMessage();
+	  var auth2 = gapi.auth2.getAuthInstance();
+	  var user = auth2.currentUser.get();
+	  input.submitChatMessage(user);
 	  phrase.clear();
 	  return false;
 	});
-
-	// $('#word-list').click(function(e){
-	//   var word = e.currentTarget.innerHTML
-	//   console.log(word)
-	// })
 
 	$('#search-pane').click(function () {
 	  var message = input.getChatMessage();
@@ -90,10 +89,12 @@
 	var phrase = __webpack_require__(4);
 
 	//when the user enters a message into the chat window
-	function submitChatMessage() {
+	function submitChatMessage(user) {
 	  console.log('here');
 	  var message = $('#m').val();
 	  var username = $('#username').text();
+	  var token = user.getAuthResponse().id_token;
+	  console.log(token);
 	  if (message !== '') socket.sendMessage({ from: username, message: message });
 	  $('#m').val('');
 	}
@@ -421,10 +422,7 @@
 	  //console.log(definitionArray)
 
 	  definitionArray.map(function (definition) {
-	    console.log("MATCH", wordToMatch, 'word', definition.word);
-	    console.log('match?', wordToMatch == definition.word);
 	    if (definition.word == wordToMatch) {
-
 	      $('#search-pane').text('');
 	      $('#search-pane').append(definition.definition);
 	    }

@@ -123,10 +123,7 @@ function showDef(event){
   //console.log(definitionArray)
 
   definitionArray.map(function(definition){
-    console.log("MATCH", wordToMatch, 'word', definition.word)
-    console.log('match?', wordToMatch == definition.word)
     if (definition.word == wordToMatch){
-
       $('#search-pane').text('')
       $('#search-pane').append(definition.definition)
     }

@@ -31,3 +31,18 @@ block content
         div(id='phrase-pane' class='panel panel-primary')
   script(type='text/javascript' src="/socket.io/socket.io.js")
   script(type='text/javascript' src='./javascripts/bundle.js')
+  script(type='text/javascript' src='./javascripts/google.js')
+  script(src="https://apis.google.com/js/client:platform.js?onload=startApp")
+  div(class='g-signin2' data-onsuccess='onSignIn' style="display: none;")
+  
+  //- script(type='text/javascript').
+  //-   function onSignIn(googleUser) {
+  //-     var profile = googleUser.getBasicProfile();
+  //-     console.log('ID: ' + profile.getId());
+  //-     console.log('Name: ' + profile.getName());
+  //-     console.log('Image URL: ' + profile.getImageUrl());
+  //-     console.log('Email: ' + profile.getEmail());
+  //-     var id_token = googleUser.getAuthResponse().id_token;
+  //-     console.log('token', id_token)
+  //-     
+  //-   }

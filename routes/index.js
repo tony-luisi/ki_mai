@@ -6,6 +6,8 @@ var path = require('path')
 var Spellchecker = require("hunspell-spellchecker");
 var spellchecker = new Spellchecker();
 var fs = require('fs')
+var db = require(path.join(__dirname, '../db/db'));
+
 var DICT = spellchecker.parse({
     aff: fs.readFileSync(path.join(__dirname,'../lib/spelling/mi_NZ.aff')),
     dic: fs.readFileSync(path.join(__dirname,'../lib/spelling/mi_NZ.dic'))
@@ -17,6 +19,9 @@ module.exports = function(io) {
   var router = app.Router()
 
   router.get('/', function(req, res, next) {
+    db.getUsers().then(function(result){
+      console.log('users', result)
+    })
     var username = req.query.username || 'user'
     username = username.charAt(0).toUpperCase() + username.substring(1)
     console.log(username)
