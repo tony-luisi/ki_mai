@@ -47,7 +47,7 @@ router.post('/', function(req, res, next){
     user.password = hash
     db.addUser(user).then(function(result){
       console.log('row affected', result)
-      res.send(req.body)
+      res.redirect('/')
     })
   })
 
