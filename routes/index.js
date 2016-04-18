@@ -39,10 +39,11 @@ module.exports = function(io) {
   router.get('/chat', function(req,res,next){
     console.log(req.session)
     if (req.session.userId){
-      var username = req.query.username || 'user'
-      username = username.charAt(0).toUpperCase() + username.substring(1)
-      console.log(username)
-      res.render('index', { title: 'Ki Mai', name: username });
+      db.getUser({ id: req.session.userId }).then(function(result){
+        var username = result[0].fullname || 'user'
+        console.log(username)
+        res.render('index', { title: 'Ki Mai', name: username });
+      })
     } else {
       res.redirect('/users')
     }
