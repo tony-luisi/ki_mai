@@ -3,21 +3,25 @@ extends layout
 block content
   div(class='container-fluid')
     div(class='row' id='titles')
-      div(class='col-md-12 jumbotron')
-        h1 Welcome to Kī Mai
-        form(action='/login' method='POST')
+      div(class='col-md-12')
+        h1 Registration
+        form(action='/users' method='POST')
           div(class='row')
             div(class='form-group' class='col-md-6')
               label(for='username') Username: 
               input(type='text' name='username' class='form-control' placeholder='Username')
           div(class='row')
             div(class='form-group' class='col-md-6')
+              label(for='fullname') Full Name: 
+              input(type='text' name='fullname' class='form-control' placeholder="Full Name")
+          div(class='row')
+            div(class='form-group' class='col-md-6')
+              label(for='email') E-mail: 
+              input(type='text' name='email' class='form-control' placeholder='E-mail')
+          div(class='row')
+            div(class='form-group' class='col-md-6')
               label(for='password') Password: 
               input(type='password' name='password' class='form-control' placeholder='Password')
           div(class='row')
             div(class='form-group' class='col-md-6')
-              button(class='btn btn-success') Login
-
-        //- div(class='g-signin2' data-onsuccess='onSignIn')
-  //- script(type='text/javascript' src='./javascripts/google.js')
-  //- script(src="https://apis.google.com/js/client:platform.js?onload=startApp")
+              button(class='btn btn-success') Register

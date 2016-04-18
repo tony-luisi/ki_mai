@@ -4,6 +4,7 @@ var render = require('./render')
 var wordsArray = []
 var translatedWords = []
 var definitionArray = []
+var ngata = require('./ngata.jade')
 
 function update(message){
   message = message.split(' ')
@@ -26,6 +27,8 @@ function addLookup(word, lookupArray){
   console.log(lookupDiv)
   $('#search-pane').append(lookupDiv)
 }
+
+
 
 function createLookup(lookupWord, lookupArray){
   var definitionDiv = document.createElement('div')
@@ -71,6 +74,8 @@ function replaceLookup(event){
 function addTranslation(data){
   console.log('data', data)
   if (data.length > 0){
+    var template = ngata({ word: 'hello', definition: data})
+    console.log('template', template)
     var definition = createDefinition(data)
     var word = render.createWord(data)
     word.addEventListener('click', showDef)

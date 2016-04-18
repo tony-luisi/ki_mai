@@ -33,44 +33,44 @@ $('#search-pane').click(function(){
   phrase.update(message)
 })
 
-function hasGetUserMedia() {
-  return !!(navigator.getUserMedia || navigator.webkitGetUserMedia ||
-            navigator.mozGetUserMedia || navigator.msGetUserMedia);
-}
-
-if (hasGetUserMedia()) {
-  console.log('success')
-
-  navigator.getUserMedia  = navigator.getUserMedia ||
-                            navigator.webkitGetUserMedia ||
-                            navigator.mozGetUserMedia ||
-                            navigator.msGetUserMedia;
-
-  window.AudioContext = window.AudioContext ||
-                      window.webkitAudioContext;
-
-  var context = new AudioContext();
-
-  var audio = document.querySelector('audio');
-
-  if (navigator.getUserMedia) {
-
-
-    navigator.getUserMedia({audio: true}, function(stream) {
-      var microphone = context.createMediaStreamSource(stream);
-      var filter = context.createBiquadFilter();
-
-      // microphone -> filter -> destination.
-      microphone.connect(filter);
-      filter.connect(context.destination);
-    }, function (error) {
-      console.log(error)
-    });
-  }
-
-} else {
-  alert('getUserMedia() is not supported in your browser');
-}
+// function hasGetUserMedia() {
+//   return !!(navigator.getUserMedia || navigator.webkitGetUserMedia ||
+//             navigator.mozGetUserMedia || navigator.msGetUserMedia);
+// }
+//
+// if (hasGetUserMedia()) {
+//   console.log('success')
+//
+//   navigator.getUserMedia  = navigator.getUserMedia ||
+//                             navigator.webkitGetUserMedia ||
+//                             navigator.mozGetUserMedia ||
+//                             navigator.msGetUserMedia;
+//
+//   window.AudioContext = window.AudioContext ||
+//                       window.webkitAudioContext;
+//
+//   var context = new AudioContext();
+//
+//   var audio = document.querySelector('audio');
+//
+//   if (navigator.getUserMedia) {
+//
+//
+//     navigator.getUserMedia({audio: true}, function(stream) {
+//       var microphone = context.createMediaStreamSource(stream);
+//       var filter = context.createBiquadFilter();
+//
+//       // microphone -> filter -> destination.
+//       microphone.connect(filter);
+//       filter.connect(context.destination);
+//     }, function (error) {
+//       console.log(error)
+//     });
+//   }
+//
+// } else {
+//   alert('getUserMedia() is not supported in your browser');
+// }
 
 // navigator.mediaDevices.getUserMedia({ audio: true, video: false })
 //   .then(function(mediaStream){

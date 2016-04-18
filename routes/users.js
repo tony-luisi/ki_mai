@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var path = require('path')
 var db = require(path.join(__dirname, '../db/db'));
+var passwordHash = require('password-hash')
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -20,6 +21,20 @@ router.get('/words', function(req, res, next){
     res.send(result)
   })
 })
+
+router.get('/new', function(req,res,next){
+  res.render('usersNew')
+})
+
+router.post('/', function(req, res, next){
+  var user = req.body
+  user.password = passwordHash.generate(user.password);
+  db.addUser(user).then(function(result){
+    console.log('row affected', result)
+    res.send(req.body)
+  })
+})
+
 
 router.get('/session', function(req, res, next){
   var sess = req.session

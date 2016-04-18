@@ -1,0 +1,4 @@
+div.overall-definition.animated.fadeIn(id=word)
+  each def in definition
+    div.single-definition&attributes({'maori': def.maori_search})
+      p= def.english_search + " > " + def.maori_search

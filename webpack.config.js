@@ -20,8 +20,8 @@ module.exports = {
        query: {
          cacheDirectory: true,
          presets: ['react', 'es2015']
-       }
-     }
+       }},
+       { test: /\.jade$/, loader: "jade" }
    ]
  },
  resolve: {

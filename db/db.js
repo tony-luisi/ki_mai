@@ -20,5 +20,10 @@ module.exports =  {
 
     allWords: function(){
       return knex('words')
+    },
+
+    addUser: function(user){
+      return knex('users').insert(user)
+
     }
 }
