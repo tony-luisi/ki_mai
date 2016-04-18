@@ -8,6 +8,7 @@
     "dev": "nodemon"
   },
   "dependencies": {
+    "bcrypt": "^0.8.5",
     "body-parser": "~1.13.2",
     "cheerio": "^0.20.0",
     "connect-redis": "^3.0.2",

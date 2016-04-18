@@ -14,7 +14,10 @@ function sendSpellcheck(message, callback){
 
 function sendTranslate(message, callback){
   socket.emit('translate', { text: message }, function(data){
-    callback(data)
+    if(message.slice(-1)=='$'){
+      message = message.slice(0,message.length-1)
+    }
+    callback(data, message)
   })
 }
 

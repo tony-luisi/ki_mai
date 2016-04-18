@@ -1,10 +1,10 @@
 var socket = require('./socket')
 var input = require('./input')
-var render = require('./render')
 var wordsArray = []
 var translatedWords = []
 var definitionArray = []
-var ngata = require('./ngata.jade')
+var definitionTemplate = require('./definition.jade')
+var wordTemplate = require('./word.jade')
 
 function update(message){
   message = message.split(' ')
@@ -17,131 +17,47 @@ function update(message){
   })
 }
 
-function addLookup(word, lookupArray){
-  console.log('lookup', lookupArray)
-  var wordDiv = render.createWord(null, word)
-  wordDiv.addEventListener('click', showDef)
-  $('#word-list').append(wordDiv)
-  var lookupDiv = createLookup(word, lookupArray)
-  definitionArray.push({ word: word, definition: lookupDiv})
-  console.log(lookupDiv)
-  $('#search-pane').append(lookupDiv)
-}
-
-
-
-function createLookup(lookupWord, lookupArray){
-  var definitionDiv = document.createElement('div')
-  definitionDiv.className = 'overall-definition animated fadeIn'
-  definitionDiv.id = 'lookup-'+lookupWord
-
-  lookupArray.map(function(theWord){
-    var singleWordDiv = document.createElement('button')
-    singleWordDiv.className = 'single-definition btn btn-default'
-    singleWordDiv.addEventListener('click', replaceLookup)
-
-    var word = document.createElement('p')
-    word.innerHTML = lookupWord + " > " + theWord.title
-
-
-    singleWordDiv.setAttribute("from_word", lookupWord)
-    singleWordDiv.setAttribute("to_word", theWord.title)
-
-    singleWordDiv.appendChild(word)
-
-    theWord.details.map(function(detail){
-      var englishSentence = document.createElement('div')
-      englishSentence.innerHTML = detail
-      singleWordDiv.appendChild(englishSentence)
-    })
-    definitionDiv.appendChild(singleWordDiv)
-  })
-  return definitionDiv
-}
-
-function replaceLookup(event){
-  console.log(event.currentTarget)
-  var newWord = event.currentTarget.getAttribute('to_word')
-  var oldWord = event.currentTarget.getAttribute('from_word')
-  // //get string
-  var chatPhrase = $("#m").val()
-  chatPhrase = chatPhrase.replace(oldWord,newWord)
-  $("#m").val(chatPhrase)
-}
-
-
-
-function addTranslation(data){
-  console.log('data', data)
+function addTranslation(data, word){
   if (data.length > 0){
-    var template = ngata({ word: 'hello', definition: data})
-    console.log('template', template)
-    var definition = createDefinition(data)
-    var word = render.createWord(data)
-    word.addEventListener('click', showDef)
-    $('#search-pane').append(definition)
-    $('#word-list').append(word)
-    definitionArray.push(definition)
-    var element = document.getElementById('search-pane')
-    element.scrollTop += 1000
+    var defTemp = $.parseHTML(definitionTemplate({ word: word, definition: data}))
+    var wordTemp = $.parseHTML(wordTemplate({ word: word }))
+    $(defTemp).children('button').click(defClick)
+    $(wordTemp).click(wordClick)
+    $('#search-pane').text('')
+    $('#search-pane').append(defTemp)
+    $('#word-list').append(wordTemp)
+    definitionArray.push(defTemp[0])
   }
 }
 
-//creating an element for the translation and returning it
-function createDefinition(wordsObject){
-  //outside tag
-  var definitionDiv = document.createElement('div')
-  definitionDiv.className = 'overall-definition animated fadeIn'
-  definitionDiv.id = wordsObject[0].english_search
-
-  wordsObject.map(function(theWord){
-    var singleWordDiv = document.createElement('button')
-    singleWordDiv.className = 'single-definition btn btn-default'
-    singleWordDiv.addEventListener('click', replaceWord)
-    var word = document.createElement('p')
-    word.innerHTML = theWord.english_search + " > " + theWord.maori_search
-    singleWordDiv.setAttribute("maori_word", theWord.maori_search.split(",")[0].trim())
-    singleWordDiv.setAttribute("english_word", theWord.english_search.split(",")[0].trim())
-    singleWordDiv.appendChild(word)
-    var englishSentence = document.createElement('p')
-    englishSentence.innerHTML = theWord.english_sentence
-    singleWordDiv.appendChild(englishSentence)
-    var maoriSentence = document.createElement('p')
-    maoriSentence.innerHTML = theWord.maori_sentence
-    singleWordDiv.appendChild(maoriSentence)
-    definitionDiv.appendChild(singleWordDiv)
+function wordClick(event){
+  var wordLookup = event.currentTarget.id.split('-').pop()
+  var correctDefinition = definitionArray.filter(function(define){
+    return define.id.split('-').pop() == wordLookup
   })
-  return definitionDiv
+  $('#search-pane').text('')
+  $('#search-pane').append(correctDefinition)
+  $(correctDefinition).children('button').click(defClick)
 }
 
-function replaceWord(event){
-  var newWord = event.currentTarget.getAttribute('maori_word')
-  var oldWord = event.currentTarget.getAttribute('english_word')
-  //get string
-  var chatPhrase = $("#m").val()
-  chatPhrase = chatPhrase.replace(oldWord+"$",newWord)
-  $('#m').val(chatPhrase)
-}
-function showDef(event){
-  var wordToMatch = event.currentTarget.innerText.trim()
-  //$('#search-pane').scrollTop(0)
-  //var positionDifference = $("#"+wordToMatch).position().top - $('#search-pane').scrollTop()
-  //$('#search-pane').scrollTop(positionDifference)
-  //$('#search-pane').append(definition)
-  //console.log(definitionArray)
+function defClick(event){
+  var wordToMatch = event.currentTarget.getAttribute("from")
+  var wordToReplace = event.currentTarget.getAttribute("to")
 
-  definitionArray.map(function(definition){
-    if (definition.word == wordToMatch){
-      $('#search-pane').text('')
-      $('#search-pane').append(definition.definition)
+  var inputString = $('#m').val()
+  console.log('click', event.currentTarget)
+  var words = inputString.split(" ")
+  var result = words.map(function(word){
+    if (word == wordToMatch){
+      return wordToReplace
+    } else if (word == wordToMatch+'$') {
+      return wordToReplace
+    } else {
+      return word
     }
-  })
+  }).join(" ")
+  $('#m').val(result)
 }
-
-
-
-
 module.exports = {
-  update: update,
-  addLookup: addLookup
+  update: update
 }

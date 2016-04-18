@@ -18,6 +18,10 @@ module.exports =  {
       return knex('users').where({ google_id: googleid })
     },
 
+    getUser: function(user){
+      return knex('users').where(user)
+    },
+
     allWords: function(){
       return knex('words')
     },

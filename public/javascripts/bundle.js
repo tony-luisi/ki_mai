@@ -49,12 +49,10 @@
 	var input = __webpack_require__(1);
 	var phrase = __webpack_require__(4);
 	var translate = __webpack_require__(5);
-	var spelling = __webpack_require__(8);
+	var spelling = __webpack_require__(10);
 
 	$('form').submit(function () {
-	  var auth2 = gapi.auth2.getAuthInstance();
-	  var user = auth2.currentUser.get();
-	  input.submitChatMessage(user);
+	  input.submitChatMessage('user');
 	  phrase.clear();
 	  return false;
 	});
@@ -67,9 +65,7 @@
 	});
 
 	$('#sendbutton').click(function () {
-	  var auth2 = gapi.auth2.getAuthInstance();
-	  var user = auth2.currentUser.get();
-	  input.submitChatMessage(user);
+	  input.submitChatMessage('user');
 	  phrase.clear();
 	  return false;
 	});
@@ -78,59 +74,6 @@
 	  var message = input.getChatMessage();
 	  phrase.update(message);
 	});
-
-	// function hasGetUserMedia() {
-	//   return !!(navigator.getUserMedia || navigator.webkitGetUserMedia ||
-	//             navigator.mozGetUserMedia || navigator.msGetUserMedia);
-	// }
-	//
-	// if (hasGetUserMedia()) {
-	//   console.log('success')
-	//
-	//   navigator.getUserMedia  = navigator.getUserMedia ||
-	//                             navigator.webkitGetUserMedia ||
-	//                             navigator.mozGetUserMedia ||
-	//                             navigator.msGetUserMedia;
-	//
-	//   window.AudioContext = window.AudioContext ||
-	//                       window.webkitAudioContext;
-	//
-	//   var context = new AudioContext();
-	//
-	//   var audio = document.querySelector('audio');
-	//
-	//   if (navigator.getUserMedia) {
-	//
-	//
-	//     navigator.getUserMedia({audio: true}, function(stream) {
-	//       var microphone = context.createMediaStreamSource(stream);
-	//       var filter = context.createBiquadFilter();
-	//
-	//       // microphone -> filter -> destination.
-	//       microphone.connect(filter);
-	//       filter.connect(context.destination);
-	//     }, function (error) {
-	//       console.log(error)
-	//     });
-	//   }
-	//
-	// } else {
-	//   alert('getUserMedia() is not supported in your browser');
-	// }
-
-	// navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-	//   .then(function(mediaStream){
-	//     //var audio = document.querySelector('#audio');
-	//     // video.src = window.URL.createObjectURL(mediaStream);
-	//     // video.onloadedmetadata = function(e) {
-	//     //
-	//     // }
-	//     // Do something with the video here.
-	//     console.log(mediaStream)
-	//   })
-	//   .catch(function(error) {
-	//     console.log(error)
-	//   })
 
 /***/ },
 /* 1 */
@@ -146,8 +89,6 @@
 	  console.log('here');
 	  var message = $('#m').val();
 	  var username = $('#username').text();
-	  var token = user.getAuthResponse().id_token;
-	  console.log(token);
 	  if (message !== '') socket.sendMessage({ from: username, message: message });
 	  $('#m').val('');
 	}
@@ -188,7 +129,10 @@
 
 	function sendTranslate(message, callback) {
 	  socket.emit('translate', { text: message }, function (data) {
-	    callback(data);
+	    if (message.slice(-1) == '$') {
+	      message = message.slice(0, message.length - 1);
+	    }
+	    callback(data, message);
 	  });
 	}
 
@@ -245,7 +189,7 @@
 	function renderSpelling() {
 	  spellchecked.map(function (word) {
 	    if (!word.correct && !$('#word-' + word.word).hasClass()) {
-	      $('#word-' + word.word).removeClass('btn-link').addClass('btn-warning');
+	      $('#phrase-' + word.word).removeClass('btn-link').addClass('btn-warning');
 	    }
 	  });
 	}
@@ -273,7 +217,7 @@
 	  // translate.update(word + "$")
 	  socket.sendDefinition(word, function (err, res) {
 	    if (res.length > 0) {
-	      translate.addLookup(word, res);
+	      translate.update(word + '$', res);
 	    }
 	    // $.ajax({
 	    //   method: "POST",
@@ -292,7 +236,7 @@
 	    word = filter(word);
 	    word = word.toLowerCase();
 	    var wordButton = document.createElement('button');
-	    wordButton.id = 'word-' + word;
+	    wordButton.id = 'phrase-' + word;
 	    wordButton.className = getClass(word);
 	    wordButton.innerHTML = word;
 	    wordButton.addEventListener('click', getDef);
@@ -363,11 +307,11 @@
 
 	var socket = __webpack_require__(2);
 	var input = __webpack_require__(1);
-	var render = __webpack_require__(6);
 	var wordsArray = [];
 	var translatedWords = [];
 	var definitionArray = [];
-	var ngata = __webpack_require__(7);
+	var definitionTemplate = __webpack_require__(17);
+	var wordTemplate = __webpack_require__(18);
 
 	function update(message) {
 	  message = message.split(' ');
@@ -380,192 +324,318 @@
 	  });
 	}
 
-	function addLookup(word, lookupArray) {
-	  console.log('lookup', lookupArray);
-	  var wordDiv = render.createWord(null, word);
-	  wordDiv.addEventListener('click', showDef);
-	  $('#word-list').append(wordDiv);
-	  var lookupDiv = createLookup(word, lookupArray);
-	  definitionArray.push({ word: word, definition: lookupDiv });
-	  console.log(lookupDiv);
-	  $('#search-pane').append(lookupDiv);
-	}
-
-	function createLookup(lookupWord, lookupArray) {
-	  var definitionDiv = document.createElement('div');
-	  definitionDiv.className = 'overall-definition animated fadeIn';
-	  definitionDiv.id = 'lookup-' + lookupWord;
-
-	  lookupArray.map(function (theWord) {
-	    var singleWordDiv = document.createElement('button');
-	    singleWordDiv.className = 'single-definition btn btn-default';
-	    singleWordDiv.addEventListener('click', replaceLookup);
-
-	    var word = document.createElement('p');
-	    word.innerHTML = lookupWord + " > " + theWord.title;
-
-	    singleWordDiv.setAttribute("from_word", lookupWord);
-	    singleWordDiv.setAttribute("to_word", theWord.title);
-
-	    singleWordDiv.appendChild(word);
-
-	    theWord.details.map(function (detail) {
-	      var englishSentence = document.createElement('div');
-	      englishSentence.innerHTML = detail;
-	      singleWordDiv.appendChild(englishSentence);
-	    });
-	    definitionDiv.appendChild(singleWordDiv);
-	  });
-	  return definitionDiv;
-	}
-
-	function replaceLookup(event) {
-	  console.log(event.currentTarget);
-	  var newWord = event.currentTarget.getAttribute('to_word');
-	  var oldWord = event.currentTarget.getAttribute('from_word');
-	  // //get string
-	  var chatPhrase = $("#m").val();
-	  chatPhrase = chatPhrase.replace(oldWord, newWord);
-	  $("#m").val(chatPhrase);
-	}
-
-	function addTranslation(data) {
-	  console.log('data', data);
+	function addTranslation(data, word) {
 	  if (data.length > 0) {
-	    var template = ngata({ word: 'hello', definition: data });
-	    console.log('template', template);
-	    var definition = createDefinition(data);
-	    var word = render.createWord(data);
-	    word.addEventListener('click', showDef);
-	    $('#search-pane').append(definition);
-	    $('#word-list').append(word);
-	    definitionArray.push(definition);
-	    var element = document.getElementById('search-pane');
-	    element.scrollTop += 1000;
+	    var defTemp = $.parseHTML(definitionTemplate({ word: word, definition: data }));
+	    var wordTemp = $.parseHTML(wordTemplate({ word: word }));
+	    $(defTemp).children('button').click(defClick);
+	    $(wordTemp).click(wordClick);
+	    $('#search-pane').text('');
+	    $('#search-pane').append(defTemp);
+	    $('#word-list').append(wordTemp);
+	    definitionArray.push(defTemp[0]);
 	  }
 	}
 
-	//creating an element for the translation and returning it
-	function createDefinition(wordsObject) {
-	  //outside tag
-	  var definitionDiv = document.createElement('div');
-	  definitionDiv.className = 'overall-definition animated fadeIn';
-	  definitionDiv.id = wordsObject[0].english_search;
-
-	  wordsObject.map(function (theWord) {
-	    var singleWordDiv = document.createElement('button');
-	    singleWordDiv.className = 'single-definition btn btn-default';
-	    singleWordDiv.addEventListener('click', replaceWord);
-	    var word = document.createElement('p');
-	    word.innerHTML = theWord.english_search + " > " + theWord.maori_search;
-	    singleWordDiv.setAttribute("maori_word", theWord.maori_search.split(",")[0].trim());
-	    singleWordDiv.setAttribute("english_word", theWord.english_search.split(",")[0].trim());
-	    singleWordDiv.appendChild(word);
-	    var englishSentence = document.createElement('p');
-	    englishSentence.innerHTML = theWord.english_sentence;
-	    singleWordDiv.appendChild(englishSentence);
-	    var maoriSentence = document.createElement('p');
-	    maoriSentence.innerHTML = theWord.maori_sentence;
-	    singleWordDiv.appendChild(maoriSentence);
-	    definitionDiv.appendChild(singleWordDiv);
+	function wordClick(event) {
+	  var wordLookup = event.currentTarget.id.split('-').pop();
+	  var correctDefinition = definitionArray.filter(function (define) {
+	    return define.id.split('-').pop() == wordLookup;
 	  });
-	  return definitionDiv;
+	  $('#search-pane').text('');
+	  $('#search-pane').append(correctDefinition);
+	  $(correctDefinition).children('button').click(defClick);
 	}
 
-	function replaceWord(event) {
-	  var newWord = event.currentTarget.getAttribute('maori_word');
-	  var oldWord = event.currentTarget.getAttribute('english_word');
-	  //get string
-	  var chatPhrase = $("#m").val();
-	  chatPhrase = chatPhrase.replace(oldWord + "$", newWord);
-	  $('#m').val(chatPhrase);
-	}
-	function showDef(event) {
-	  var wordToMatch = event.currentTarget.innerText.trim();
-	  //$('#search-pane').scrollTop(0)
-	  //var positionDifference = $("#"+wordToMatch).position().top - $('#search-pane').scrollTop()
-	  //$('#search-pane').scrollTop(positionDifference)
-	  //$('#search-pane').append(definition)
-	  //console.log(definitionArray)
+	function defClick(event) {
+	  var wordToMatch = event.currentTarget.getAttribute("from");
+	  var wordToReplace = event.currentTarget.getAttribute("to");
 
-	  definitionArray.map(function (definition) {
-	    if (definition.word == wordToMatch) {
-	      $('#search-pane').text('');
-	      $('#search-pane').append(definition.definition);
+	  var inputString = $('#m').val();
+	  console.log('click', event.currentTarget);
+	  var words = inputString.split(" ");
+	  var result = words.map(function (word) {
+	    if (word == wordToMatch) {
+	      return wordToReplace;
+	    } else if (word == wordToMatch + '$') {
+	      return wordToReplace;
+	    } else {
+	      return word;
 	    }
-	  });
+	  }).join(" ");
+	  $('#m').val(result);
 	}
-
 	module.exports = {
-	  update: update,
-	  addLookup: addLookup
+	  update: update
 	};
 
 /***/ },
-/* 6 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	function createWord(wordsObject, theWord) {
-	  var wordDiv = document.createElement('button');
-	  wordDiv.className = 'word btn btn-default';
-	  var word = document.createElement('p');
-	  if (wordsObject) var theWord = wordsObject[0].english_search;
-	  word.innerHTML = theWord;
-	  wordDiv.appendChild(word);
-	  return wordDiv;
-	}
-
-	module.exports = {
-	  createWord: createWord
-
-	};
-
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var jade = __webpack_require__(15);
-
-	module.exports = function template(locals) {
-	var buf = [];
-	var jade_mixins = {};
-	var jade_interp;
-	;var locals_for_with = (locals || {});(function (definition, undefined, word) {
-	buf.push("<div" + (jade.attr("id", word, true, true)) + " class=\"overall-definition animated fadeIn\">");
-	// iterate definition
-	;(function(){
-	  var $$obj = definition;
-	  if ('number' == typeof $$obj.length) {
-
-	    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
-	      var def = $$obj[$index];
-
-	buf.push("<div" + (jade.attrs(jade.merge([{"class": "single-definition"},{'maori': def.maori_search}]), true)) + "><p>" + (jade.escape(null == (jade_interp = def.english_search + " > " + def.maori_search) ? "" : jade_interp)) + "</p></div>");
-	    }
-
-	  } else {
-	    var $$l = 0;
-	    for (var $index in $$obj) {
-	      $$l++;      var def = $$obj[$index];
-
-	buf.push("<div" + (jade.attrs(jade.merge([{"class": "single-definition"},{'maori': def.maori_search}]), true)) + "><p>" + (jade.escape(null == (jade_interp = def.english_search + " > " + def.maori_search) ? "" : jade_interp)) + "</p></div>");
-	    }
-
-	  }
-	}).call(this);
-
-	buf.push("</div>");}.call(this,"definition" in locals_for_with?locals_for_with.definition:typeof definition!=="undefined"?definition:undefined,"undefined" in locals_for_with?locals_for_with.undefined: false?undefined:undefined,"word" in locals_for_with?locals_for_with.word:typeof word!=="undefined"?word:undefined));;return buf.join("");
-	}
-
-/***/ },
+/* 6 */,
+/* 7 */,
 /* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var request = __webpack_require__(9);
+	/**
+	 * Merge two attribute objects giving precedence
+	 * to values in object `b`. Classes are special-cased
+	 * allowing for arrays and merging/joining appropriately
+	 * resulting in a string.
+	 *
+	 * @param {Object} a
+	 * @param {Object} b
+	 * @return {Object} a
+	 * @api private
+	 */
+
+	exports.merge = function merge(a, b) {
+	  if (arguments.length === 1) {
+	    var attrs = a[0];
+	    for (var i = 1; i < a.length; i++) {
+	      attrs = merge(attrs, a[i]);
+	    }
+	    return attrs;
+	  }
+	  var ac = a['class'];
+	  var bc = b['class'];
+
+	  if (ac || bc) {
+	    ac = ac || [];
+	    bc = bc || [];
+	    if (!Array.isArray(ac)) ac = [ac];
+	    if (!Array.isArray(bc)) bc = [bc];
+	    a['class'] = ac.concat(bc).filter(nulls);
+	  }
+
+	  for (var key in b) {
+	    if (key != 'class') {
+	      a[key] = b[key];
+	    }
+	  }
+
+	  return a;
+	};
+
+	/**
+	 * Filter null `val`s.
+	 *
+	 * @param {*} val
+	 * @return {Boolean}
+	 * @api private
+	 */
+
+	function nulls(val) {
+	  return val != null && val !== '';
+	}
+
+	/**
+	 * join array as classes.
+	 *
+	 * @param {*} val
+	 * @return {String}
+	 */
+	exports.joinClasses = joinClasses;
+	function joinClasses(val) {
+	  return (Array.isArray(val) ? val.map(joinClasses) :
+	    (val && typeof val === 'object') ? Object.keys(val).filter(function (key) { return val[key]; }) :
+	    [val]).filter(nulls).join(' ');
+	}
+
+	/**
+	 * Render the given classes.
+	 *
+	 * @param {Array} classes
+	 * @param {Array.<Boolean>} escaped
+	 * @return {String}
+	 */
+	exports.cls = function cls(classes, escaped) {
+	  var buf = [];
+	  for (var i = 0; i < classes.length; i++) {
+	    if (escaped && escaped[i]) {
+	      buf.push(exports.escape(joinClasses([classes[i]])));
+	    } else {
+	      buf.push(joinClasses(classes[i]));
+	    }
+	  }
+	  var text = joinClasses(buf);
+	  if (text.length) {
+	    return ' class="' + text + '"';
+	  } else {
+	    return '';
+	  }
+	};
+
+
+	exports.style = function (val) {
+	  if (val && typeof val === 'object') {
+	    return Object.keys(val).map(function (style) {
+	      return style + ':' + val[style];
+	    }).join(';');
+	  } else {
+	    return val;
+	  }
+	};
+	/**
+	 * Render the given attribute.
+	 *
+	 * @param {String} key
+	 * @param {String} val
+	 * @param {Boolean} escaped
+	 * @param {Boolean} terse
+	 * @return {String}
+	 */
+	exports.attr = function attr(key, val, escaped, terse) {
+	  if (key === 'style') {
+	    val = exports.style(val);
+	  }
+	  if ('boolean' == typeof val || null == val) {
+	    if (val) {
+	      return ' ' + (terse ? key : key + '="' + key + '"');
+	    } else {
+	      return '';
+	    }
+	  } else if (0 == key.indexOf('data') && 'string' != typeof val) {
+	    if (JSON.stringify(val).indexOf('&') !== -1) {
+	      console.warn('Since Jade 2.0.0, ampersands (`&`) in data attributes ' +
+	                   'will be escaped to `&amp;`');
+	    };
+	    if (val && typeof val.toISOString === 'function') {
+	      console.warn('Jade will eliminate the double quotes around dates in ' +
+	                   'ISO form after 2.0.0');
+	    }
+	    return ' ' + key + "='" + JSON.stringify(val).replace(/'/g, '&apos;') + "'";
+	  } else if (escaped) {
+	    if (val && typeof val.toISOString === 'function') {
+	      console.warn('Jade will stringify dates in ISO form after 2.0.0');
+	    }
+	    return ' ' + key + '="' + exports.escape(val) + '"';
+	  } else {
+	    if (val && typeof val.toISOString === 'function') {
+	      console.warn('Jade will stringify dates in ISO form after 2.0.0');
+	    }
+	    return ' ' + key + '="' + val + '"';
+	  }
+	};
+
+	/**
+	 * Render the given attributes object.
+	 *
+	 * @param {Object} obj
+	 * @param {Object} escaped
+	 * @return {String}
+	 */
+	exports.attrs = function attrs(obj, terse){
+	  var buf = [];
+
+	  var keys = Object.keys(obj);
+
+	  if (keys.length) {
+	    for (var i = 0; i < keys.length; ++i) {
+	      var key = keys[i]
+	        , val = obj[key];
+
+	      if ('class' == key) {
+	        if (val = joinClasses(val)) {
+	          buf.push(' ' + key + '="' + val + '"');
+	        }
+	      } else {
+	        buf.push(exports.attr(key, val, false, terse));
+	      }
+	    }
+	  }
+
+	  return buf.join('');
+	};
+
+	/**
+	 * Escape the given string of `html`.
+	 *
+	 * @param {String} html
+	 * @return {String}
+	 * @api private
+	 */
+
+	var jade_encode_html_rules = {
+	  '&': '&amp;',
+	  '<': '&lt;',
+	  '>': '&gt;',
+	  '"': '&quot;'
+	};
+	var jade_match_html = /[&<>"]/g;
+
+	function jade_encode_char(c) {
+	  return jade_encode_html_rules[c] || c;
+	}
+
+	exports.escape = jade_escape;
+	function jade_escape(html){
+	  var result = String(html).replace(jade_match_html, jade_encode_char);
+	  if (result === '' + html) return html;
+	  else return result;
+	};
+
+	/**
+	 * Re-throw the given `err` in context to the
+	 * the jade in `filename` at the given `lineno`.
+	 *
+	 * @param {Error} err
+	 * @param {String} filename
+	 * @param {String} lineno
+	 * @api private
+	 */
+
+	exports.rethrow = function rethrow(err, filename, lineno, str){
+	  if (!(err instanceof Error)) throw err;
+	  if ((typeof window != 'undefined' || !filename) && !str) {
+	    err.message += ' on line ' + lineno;
+	    throw err;
+	  }
+	  try {
+	    str = str || __webpack_require__(9).readFileSync(filename, 'utf8')
+	  } catch (ex) {
+	    rethrow(err, null, lineno)
+	  }
+	  var context = 3
+	    , lines = str.split('\n')
+	    , start = Math.max(lineno - context, 0)
+	    , end = Math.min(lines.length, lineno + context);
+
+	  // Error context
+	  var context = lines.slice(start, end).map(function(line, i){
+	    var curr = i + start + 1;
+	    return (curr == lineno ? '  > ' : '    ')
+	      + curr
+	      + '| '
+	      + line;
+	  }).join('\n');
+
+	  // Alter exception message
+	  err.path = filename;
+	  err.message = (filename || 'Jade') + ':' + lineno
+	    + '\n' + context + '\n\n' + err.message;
+	  throw err;
+	};
+
+	exports.DebugItem = function DebugItem(lineno, filename) {
+	  this.lineno = lineno;
+	  this.filename = filename;
+	}
+
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	/* (ignored) */
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var request = __webpack_require__(11);
 
 	function getSpelling(callback) {
 	  console.log('making request');
@@ -583,17 +653,17 @@
 	};
 
 /***/ },
-/* 9 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
 	 * Module dependencies.
 	 */
 
-	var Emitter = __webpack_require__(10);
-	var reduce = __webpack_require__(11);
-	var requestBase = __webpack_require__(12);
-	var isObject = __webpack_require__(13);
+	var Emitter = __webpack_require__(12);
+	var reduce = __webpack_require__(13);
+	var requestBase = __webpack_require__(14);
+	var isObject = __webpack_require__(15);
 
 	/**
 	 * Root reference for iframes.
@@ -642,7 +712,7 @@
 	 * Expose `request`.
 	 */
 
-	var request = module.exports = __webpack_require__(14).bind(null, Request);
+	var request = module.exports = __webpack_require__(16).bind(null, Request);
 
 	/**
 	 * Determine XHR.
@@ -1666,7 +1736,7 @@
 
 
 /***/ },
-/* 10 */
+/* 12 */
 /***/ function(module, exports) {
 
 	
@@ -1833,7 +1903,7 @@
 
 
 /***/ },
-/* 11 */
+/* 13 */
 /***/ function(module, exports) {
 
 	
@@ -1862,13 +1932,13 @@
 	};
 
 /***/ },
-/* 12 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
 	 * Module of mixed-in functions shared between node and client code
 	 */
-	var isObject = __webpack_require__(13);
+	var isObject = __webpack_require__(15);
 
 	/**
 	 * Clear previous timeout.
@@ -2034,7 +2104,7 @@
 
 
 /***/ },
-/* 13 */
+/* 15 */
 /***/ function(module, exports) {
 
 	/**
@@ -2053,7 +2123,7 @@
 
 
 /***/ },
-/* 14 */
+/* 16 */
 /***/ function(module, exports) {
 
 	// The node and browser modules expose versions of this with the
@@ -2091,262 +2161,105 @@
 
 
 /***/ },
-/* 15 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	var jade = __webpack_require__(8);
 
-	/**
-	 * Merge two attribute objects giving precedence
-	 * to values in object `b`. Classes are special-cased
-	 * allowing for arrays and merging/joining appropriately
-	 * resulting in a string.
-	 *
-	 * @param {Object} a
-	 * @param {Object} b
-	 * @return {Object} a
-	 * @api private
-	 */
+	module.exports = function template(locals) {
+	var buf = [];
+	var jade_mixins = {};
+	var jade_interp;
+	;var locals_for_with = (locals || {});(function (console, definition, undefined, word) {
+	buf.push("<div" + (jade.attr("id", "def-"+word, true, true)) + " class=\"overall-definition animated fadeIn\">");
+	// iterate definition
+	;(function(){
+	  var $$obj = definition;
+	  if ('number' == typeof $$obj.length) {
 
-	exports.merge = function merge(a, b) {
-	  if (arguments.length === 1) {
-	    var attrs = a[0];
-	    for (var i = 1; i < a.length; i++) {
-	      attrs = merge(attrs, a[i]);
+	    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+	      var def = $$obj[$index];
+
+	var toWord = def.to.split(",").shift().trim()
+	console.log('word is', toWord)
+	buf.push("<button" + (jade.attrs(jade.merge([{"class": "single-definition btn btn-default"},{'from': def.from, 'to': toWord}]), true)) + "><p>" + (jade.escape(null == (jade_interp = def.from + " > " + def.to) ? "" : jade_interp)) + "</p>");
+	// iterate def.definition
+	;(function(){
+	  var $$obj = def.definition;
+	  if ('number' == typeof $$obj.length) {
+
+	    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+	      var d = $$obj[$index];
+
+	buf.push("<p>" + (null == (jade_interp = d) ? "" : jade_interp) + "</p>");
 	    }
-	    return attrs;
-	  }
-	  var ac = a['class'];
-	  var bc = b['class'];
 
-	  if (ac || bc) {
-	    ac = ac || [];
-	    bc = bc || [];
-	    if (!Array.isArray(ac)) ac = [ac];
-	    if (!Array.isArray(bc)) bc = [bc];
-	    a['class'] = ac.concat(bc).filter(nulls);
-	  }
-
-	  for (var key in b) {
-	    if (key != 'class') {
-	      a[key] = b[key];
-	    }
-	  }
-
-	  return a;
-	};
-
-	/**
-	 * Filter null `val`s.
-	 *
-	 * @param {*} val
-	 * @return {Boolean}
-	 * @api private
-	 */
-
-	function nulls(val) {
-	  return val != null && val !== '';
-	}
-
-	/**
-	 * join array as classes.
-	 *
-	 * @param {*} val
-	 * @return {String}
-	 */
-	exports.joinClasses = joinClasses;
-	function joinClasses(val) {
-	  return (Array.isArray(val) ? val.map(joinClasses) :
-	    (val && typeof val === 'object') ? Object.keys(val).filter(function (key) { return val[key]; }) :
-	    [val]).filter(nulls).join(' ');
-	}
-
-	/**
-	 * Render the given classes.
-	 *
-	 * @param {Array} classes
-	 * @param {Array.<Boolean>} escaped
-	 * @return {String}
-	 */
-	exports.cls = function cls(classes, escaped) {
-	  var buf = [];
-	  for (var i = 0; i < classes.length; i++) {
-	    if (escaped && escaped[i]) {
-	      buf.push(exports.escape(joinClasses([classes[i]])));
-	    } else {
-	      buf.push(joinClasses(classes[i]));
-	    }
-	  }
-	  var text = joinClasses(buf);
-	  if (text.length) {
-	    return ' class="' + text + '"';
 	  } else {
-	    return '';
+	    var $$l = 0;
+	    for (var $index in $$obj) {
+	      $$l++;      var d = $$obj[$index];
+
+	buf.push("<p>" + (null == (jade_interp = d) ? "" : jade_interp) + "</p>");
+	    }
+
 	  }
-	};
+	}).call(this);
 
+	buf.push("</button>");
+	    }
 
-	exports.style = function (val) {
-	  if (val && typeof val === 'object') {
-	    return Object.keys(val).map(function (style) {
-	      return style + ':' + val[style];
-	    }).join(';');
 	  } else {
-	    return val;
-	  }
-	};
-	/**
-	 * Render the given attribute.
-	 *
-	 * @param {String} key
-	 * @param {String} val
-	 * @param {Boolean} escaped
-	 * @param {Boolean} terse
-	 * @return {String}
-	 */
-	exports.attr = function attr(key, val, escaped, terse) {
-	  if (key === 'style') {
-	    val = exports.style(val);
-	  }
-	  if ('boolean' == typeof val || null == val) {
-	    if (val) {
-	      return ' ' + (terse ? key : key + '="' + key + '"');
-	    } else {
-	      return '';
+	    var $$l = 0;
+	    for (var $index in $$obj) {
+	      $$l++;      var def = $$obj[$index];
+
+	var toWord = def.to.split(",").shift().trim()
+	console.log('word is', toWord)
+	buf.push("<button" + (jade.attrs(jade.merge([{"class": "single-definition btn btn-default"},{'from': def.from, 'to': toWord}]), true)) + "><p>" + (jade.escape(null == (jade_interp = def.from + " > " + def.to) ? "" : jade_interp)) + "</p>");
+	// iterate def.definition
+	;(function(){
+	  var $$obj = def.definition;
+	  if ('number' == typeof $$obj.length) {
+
+	    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+	      var d = $$obj[$index];
+
+	buf.push("<p>" + (null == (jade_interp = d) ? "" : jade_interp) + "</p>");
 	    }
-	  } else if (0 == key.indexOf('data') && 'string' != typeof val) {
-	    if (JSON.stringify(val).indexOf('&') !== -1) {
-	      console.warn('Since Jade 2.0.0, ampersands (`&`) in data attributes ' +
-	                   'will be escaped to `&amp;`');
-	    };
-	    if (val && typeof val.toISOString === 'function') {
-	      console.warn('Jade will eliminate the double quotes around dates in ' +
-	                   'ISO form after 2.0.0');
-	    }
-	    return ' ' + key + "='" + JSON.stringify(val).replace(/'/g, '&apos;') + "'";
-	  } else if (escaped) {
-	    if (val && typeof val.toISOString === 'function') {
-	      console.warn('Jade will stringify dates in ISO form after 2.0.0');
-	    }
-	    return ' ' + key + '="' + exports.escape(val) + '"';
+
 	  } else {
-	    if (val && typeof val.toISOString === 'function') {
-	      console.warn('Jade will stringify dates in ISO form after 2.0.0');
+	    var $$l = 0;
+	    for (var $index in $$obj) {
+	      $$l++;      var d = $$obj[$index];
+
+	buf.push("<p>" + (null == (jade_interp = d) ? "" : jade_interp) + "</p>");
 	    }
-	    return ' ' + key + '="' + val + '"';
+
 	  }
-	};
+	}).call(this);
 
-	/**
-	 * Render the given attributes object.
-	 *
-	 * @param {Object} obj
-	 * @param {Object} escaped
-	 * @return {String}
-	 */
-	exports.attrs = function attrs(obj, terse){
-	  var buf = [];
-
-	  var keys = Object.keys(obj);
-
-	  if (keys.length) {
-	    for (var i = 0; i < keys.length; ++i) {
-	      var key = keys[i]
-	        , val = obj[key];
-
-	      if ('class' == key) {
-	        if (val = joinClasses(val)) {
-	          buf.push(' ' + key + '="' + val + '"');
-	        }
-	      } else {
-	        buf.push(exports.attr(key, val, false, terse));
-	      }
+	buf.push("</button>");
 	    }
+
 	  }
+	}).call(this);
 
-	  return buf.join('');
-	};
-
-	/**
-	 * Escape the given string of `html`.
-	 *
-	 * @param {String} html
-	 * @return {String}
-	 * @api private
-	 */
-
-	var jade_encode_html_rules = {
-	  '&': '&amp;',
-	  '<': '&lt;',
-	  '>': '&gt;',
-	  '"': '&quot;'
-	};
-	var jade_match_html = /[&<>"]/g;
-
-	function jade_encode_char(c) {
-	  return jade_encode_html_rules[c] || c;
+	buf.push("</div>");}.call(this,"console" in locals_for_with?locals_for_with.console:typeof console!=="undefined"?console:undefined,"definition" in locals_for_with?locals_for_with.definition:typeof definition!=="undefined"?definition:undefined,"undefined" in locals_for_with?locals_for_with.undefined: false?undefined:undefined,"word" in locals_for_with?locals_for_with.word:typeof word!=="undefined"?word:undefined));;return buf.join("");
 	}
-
-	exports.escape = jade_escape;
-	function jade_escape(html){
-	  var result = String(html).replace(jade_match_html, jade_encode_char);
-	  if (result === '' + html) return html;
-	  else return result;
-	};
-
-	/**
-	 * Re-throw the given `err` in context to the
-	 * the jade in `filename` at the given `lineno`.
-	 *
-	 * @param {Error} err
-	 * @param {String} filename
-	 * @param {String} lineno
-	 * @api private
-	 */
-
-	exports.rethrow = function rethrow(err, filename, lineno, str){
-	  if (!(err instanceof Error)) throw err;
-	  if ((typeof window != 'undefined' || !filename) && !str) {
-	    err.message += ' on line ' + lineno;
-	    throw err;
-	  }
-	  try {
-	    str = str || __webpack_require__(16).readFileSync(filename, 'utf8')
-	  } catch (ex) {
-	    rethrow(err, null, lineno)
-	  }
-	  var context = 3
-	    , lines = str.split('\n')
-	    , start = Math.max(lineno - context, 0)
-	    , end = Math.min(lines.length, lineno + context);
-
-	  // Error context
-	  var context = lines.slice(start, end).map(function(line, i){
-	    var curr = i + start + 1;
-	    return (curr == lineno ? '  > ' : '    ')
-	      + curr
-	      + '| '
-	      + line;
-	  }).join('\n');
-
-	  // Alter exception message
-	  err.path = filename;
-	  err.message = (filename || 'Jade') + ':' + lineno
-	    + '\n' + context + '\n\n' + err.message;
-	  throw err;
-	};
-
-	exports.DebugItem = function DebugItem(lineno, filename) {
-	  this.lineno = lineno;
-	  this.filename = filename;
-	}
-
 
 /***/ },
-/* 16 */
-/***/ function(module, exports) {
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
 
-	/* (ignored) */
+	var jade = __webpack_require__(8);
+
+	module.exports = function template(locals) {
+	var buf = [];
+	var jade_mixins = {};
+	var jade_interp;
+	;var locals_for_with = (locals || {});(function (word) {
+	buf.push("<button" + (jade.attr("id", "word-"+word, true, true)) + " class=\"word btn btn-default\"><p>" + (jade.escape(null == (jade_interp = word) ? "" : jade_interp)) + "</p></button>");}.call(this,"word" in locals_for_with?locals_for_with.word:typeof word!=="undefined"?word:undefined));;return buf.join("");
+	}
 
 /***/ }
 /******/ ]);

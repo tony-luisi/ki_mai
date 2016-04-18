@@ -20,11 +20,8 @@ module.exports = function(io) {
 
   router.get('/', function(req, res, next) {
     console.log(req.session)
+    res.redirect('/users')
 
-    var username = req.query.username || 'user'
-    username = username.charAt(0).toUpperCase() + username.substring(1)
-    console.log(username)
-    res.render('index', { title: 'Ki Mai', name: username });
   });
 
   router.post('/word', function(req, res, next) {
@@ -36,7 +33,31 @@ module.exports = function(io) {
         console.log('result of words', result)
         res.send('success')
       })
+    })
+  })
 
+  router.get('/chat', function(req,res,next){
+    console.log(req.session)
+    if (req.session.userId){
+      var username = req.query.username || 'user'
+      username = username.charAt(0).toUpperCase() + username.substring(1)
+      console.log(username)
+      res.render('index', { title: 'Ki Mai', name: username });
+    } else {
+      res.redirect('/users')
+    }
+
+
+  })
+
+  router.get('/ngata', function(req, res, next){
+    res.send(english.getWord(req.query.word))
+
+  })
+
+  router.get('/teaka', function(req, res, next){
+    scraper.getDefinition(req.query.word, function(err, result){
+      res.send(result)
     })
 
   })
@@ -48,9 +69,17 @@ module.exports = function(io) {
     })
 
     socket.on('translate', function(word, callback){
-      console.log('need to translate word', word)
-      var translatedWord = english.getWord(word.text.substring(0,word.text.length-1))
-      callback(translatedWord)
+      var wordToTranslate = word.text.substring(0,word.text.length-1)
+      var translatedWord = english.getWord(wordToTranslate)
+
+      if (translatedWord.length==0){
+        scraper.getDefinition(wordToTranslate, function(err, result){
+          callback(result)
+        })
+      } else {
+        callback(translatedWord)
+      }
+
     })
 
     socket.on('spelling', function(word, callback){
@@ -67,8 +96,6 @@ module.exports = function(io) {
           callback(err)
           return
         }
-        console.log('got word', res)
-        console.log('sending back')
         callback(null, res)
       })
 
