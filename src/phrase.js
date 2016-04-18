@@ -7,7 +7,7 @@ var translate = require('./translate')
 function renderSpelling(){
   spellchecked.map(function(word){
     if (!word.correct && !$('#word-' + word.word).hasClass()) {
-      $('#word-' + word.word).removeClass('btn-link').addClass('btn-warning')
+      $('#phrase-' + word.word).removeClass('btn-link').addClass('btn-warning')
     }
   })
 }
@@ -35,7 +35,7 @@ function getDef(event){
   // translate.update(word + "$")
   socket.sendDefinition(word, function(err, res){
     if (res.length > 0) {
-      translate.addLookup(word, res)
+      translate.update(word+'$', res)
     }
     // $.ajax({
     //   method: "POST",
@@ -54,7 +54,7 @@ function renderPhrase(words){
     word = filter(word)
     word = word.toLowerCase()
     var wordButton = document.createElement('button')
-    wordButton.id = 'word-' + word
+    wordButton.id = 'phrase-' + word
     wordButton.className = getClass(word)
     wordButton.innerHTML = word
     wordButton.addEventListener('click', getDef)
