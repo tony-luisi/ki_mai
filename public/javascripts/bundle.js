@@ -52,9 +52,7 @@
 	var spelling = __webpack_require__(10);
 
 	$('form').submit(function () {
-	  var auth2 = gapi.auth2.getAuthInstance();
-	  var user = auth2.currentUser.get();
-	  input.submitChatMessage(user);
+	  input.submitChatMessage('user');
 	  phrase.clear();
 	  return false;
 	});
@@ -67,9 +65,7 @@
 	});
 
 	$('#sendbutton').click(function () {
-	  var auth2 = gapi.auth2.getAuthInstance();
-	  var user = auth2.currentUser.get();
-	  input.submitChatMessage(user);
+	  input.submitChatMessage('user');
 	  phrase.clear();
 	  return false;
 	});
@@ -93,8 +89,6 @@
 	  console.log('here');
 	  var message = $('#m').val();
 	  var username = $('#username').text();
-	  var token = user.getAuthResponse().id_token;
-	  console.log(token);
 	  if (message !== '') socket.sendMessage({ from: username, message: message });
 	  $('#m').val('');
 	}
@@ -313,7 +307,6 @@
 
 	var socket = __webpack_require__(2);
 	var input = __webpack_require__(1);
-	var render = __webpack_require__(6);
 	var wordsArray = [];
 	var translatedWords = [];
 	var definitionArray = [];
@@ -351,44 +344,33 @@
 	  });
 	  $('#search-pane').text('');
 	  $('#search-pane').append(correctDefinition);
+	  $(correctDefinition).children('button').click(defClick);
 	}
 
 	function defClick(event) {
-	  // console.log()
+	  var wordToMatch = event.currentTarget.getAttribute("from");
+	  var wordToReplace = event.currentTarget.getAttribute("to");
+
+	  var inputString = $('#m').val();
 	  console.log('click', event.currentTarget);
-	  // var newWord = event.currentTarget.getAttribute('maori_word')
-	  // var oldWord = event.currentTarget.getAttribute('english_word')
-	  // //get string
-	  // var chatPhrase = $("#m").val()
-	  // chatPhrase = chatPhrase.replace(oldWord+"$",newWord)
-	  // $('#m').val(chatPhrase)
+	  var words = inputString.split(" ");
+	  var result = words.map(function (word) {
+	    if (word == wordToMatch) {
+	      return wordToReplace;
+	    } else if (word == wordToMatch + '$') {
+	      return wordToReplace;
+	    } else {
+	      return word;
+	    }
+	  }).join(" ");
+	  $('#m').val(result);
 	}
 	module.exports = {
 	  update: update
 	};
 
 /***/ },
-/* 6 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	function createWord(wordsObject, theWord) {
-	  var wordDiv = document.createElement('button');
-	  wordDiv.className = 'word btn btn-default';
-	  var word = document.createElement('p');
-	  if (wordsObject) var theWord = wordsObject[0].english_search;
-	  word.innerHTML = theWord;
-	  wordDiv.appendChild(word);
-	  return wordDiv;
-	}
-
-	module.exports = {
-	  createWord: createWord
-
-	};
-
-/***/ },
+/* 6 */,
 /* 7 */,
 /* 8 */
 /***/ function(module, exports, __webpack_require__) {

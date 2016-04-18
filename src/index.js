@@ -5,9 +5,7 @@ var spelling = require('./spelling')
 
 
 $('form').submit(function(){
-  var auth2 = gapi.auth2.getAuthInstance()
-  var user = auth2.currentUser.get()
-  input.submitChatMessage(user)
+  input.submitChatMessage('user')
   phrase.clear()
   return false
 })
@@ -21,9 +19,7 @@ $('#m').on('keyup', function() {
 
 
 $('#sendbutton').click(function(){
-  var auth2 = gapi.auth2.getAuthInstance()
-  var user = auth2.currentUser.get()
-  input.submitChatMessage(user)
+  input.submitChatMessage('user')
   phrase.clear()
   return false
 })

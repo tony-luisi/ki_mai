@@ -20,11 +20,8 @@ module.exports = function(io) {
 
   router.get('/', function(req, res, next) {
     console.log(req.session)
+    res.redirect('/users')
 
-    var username = req.query.username || 'user'
-    username = username.charAt(0).toUpperCase() + username.substring(1)
-    console.log(username)
-    res.render('index', { title: 'Ki Mai', name: username });
   });
 
   router.post('/word', function(req, res, next) {
@@ -37,6 +34,20 @@ module.exports = function(io) {
         res.send('success')
       })
     })
+  })
+
+  router.get('/chat', function(req,res,next){
+    console.log(req.session)
+    if (req.session.userId){
+      var username = req.query.username || 'user'
+      username = username.charAt(0).toUpperCase() + username.substring(1)
+      console.log(username)
+      res.render('index', { title: 'Ki Mai', name: username });
+    } else {
+      res.redirect('/users')
+    }
+
+
   })
 
   router.get('/ngata', function(req, res, next){

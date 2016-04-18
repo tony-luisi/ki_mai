@@ -5,20 +5,16 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var socket_io = require('socket.io')
-
-
+var Knex = require('knex');
+var knexConfig = require(__dirname + '/knexfile')
+var knex = Knex(knexConfig[process.env.NODE_ENV || 'development'])
 var users = require('./routes/users');
-
 var app = express();
-
 var session = require('express-session');
-var KnexSessionStore = require('connect-session-knex')(session)
-var store = new KnexSessionStore()
-// var RedisStore = require('connect-redis')(session);
-
 var io = socket_io()
 app.io = io
 var routes = require('./routes/index')(io);
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -37,21 +33,12 @@ app.use(require('node-sass-middleware')({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
-    // genid: function(req) {
-    //   return genuuid() // use UUIDs for session IDs
-    // },
-    secret: 'keyboard cat',
-    cookie: {
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 2 seconds for testing
-
-    },
-    store: store
+  secret: 'ssshhhhhh! Top secret!',
+  saveUninitialized: true,
+  resave: true,
+  db: knex,
+  maxAge: 300000
 }))
-// app.use(session({
-//     store: new RedisStore(options),
-//     secret: 'abcdefghik123'
-// }));
-
 
 app.use('/', routes);
 app.use('/users', users);
@@ -70,7 +57,6 @@ io.on( "connection", function( socket )
 
 
 // error handlers
-
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {

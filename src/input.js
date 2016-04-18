@@ -6,8 +6,6 @@ function submitChatMessage(user){
   console.log('here')
   var message = $('#m').val()
   var username = $('#username').text()
-  var token = user.getAuthResponse().id_token
-  console.log(token)
   if (message !== '') socket.sendMessage({ from: username, message: message })
   $('#m').val('')
 }

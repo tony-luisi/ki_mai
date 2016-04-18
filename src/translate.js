@@ -1,6 +1,5 @@
 var socket = require('./socket')
 var input = require('./input')
-var render = require('./render')
 var wordsArray = []
 var translatedWords = []
 var definitionArray = []
@@ -38,18 +37,26 @@ function wordClick(event){
   })
   $('#search-pane').text('')
   $('#search-pane').append(correctDefinition)
+  $(correctDefinition).children('button').click(defClick)
 }
 
 function defClick(event){
-  // console.log()
-  console.log('click', event.currentTarget)
-  // var newWord = event.currentTarget.getAttribute('maori_word')
-  // var oldWord = event.currentTarget.getAttribute('english_word')
-  // //get string
-  // var chatPhrase = $("#m").val()
-  // chatPhrase = chatPhrase.replace(oldWord+"$",newWord)
-  // $('#m').val(chatPhrase)
+  var wordToMatch = event.currentTarget.getAttribute("from")
+  var wordToReplace = event.currentTarget.getAttribute("to")
 
+  var inputString = $('#m').val()
+  console.log('click', event.currentTarget)
+  var words = inputString.split(" ")
+  var result = words.map(function(word){
+    if (word == wordToMatch){
+      return wordToReplace
+    } else if (word == wordToMatch+'$') {
+      return wordToReplace
+    } else {
+      return word
+    }
+  }).join(" ")
+  $('#m').val(result)
 }
 module.exports = {
   update: update

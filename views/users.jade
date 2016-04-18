@@ -5,7 +5,7 @@ block content
     div(class='row' id='titles')
       div(class='col-md-12 jumbotron')
         h1 Welcome to Kī Mai
-        form(action='/login' method='POST')
+        form(action='/users/login' method='POST')
           div(class='row')
             div(class='form-group' class='col-md-6')
               label(for='username') Username: 
@@ -17,6 +17,7 @@ block content
           div(class='row')
             div(class='form-group' class='col-md-6')
               button(class='btn btn-success') Login
+      button(class='btn btn-warning') Register
 
         //- div(class='g-signin2' data-onsuccess='onSignIn')
   //- script(type='text/javascript' src='./javascripts/google.js')
