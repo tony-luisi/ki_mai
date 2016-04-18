@@ -3,7 +3,7 @@ var phrase = require('./phrase')
 var translate = require('./translate')
 var spelling = require('./spelling')
 
-
+//every time a user inputs a keystroke
 $('form').submit(function(){
   input.submitChatMessage('user')
   phrase.clear()
@@ -17,13 +17,14 @@ $('#m').on('keyup', function() {
   translate.update(message)
 })
 
-
+//every time a user presses the submit button
 $('#sendbutton').click(function(){
   input.submitChatMessage('user')
   phrase.clear()
   return false
 })
 
+//every time a person clicks something in the word box
 $('#search-pane').click(function(){
   var message = input.getChatMessage()
   phrase.update(message)

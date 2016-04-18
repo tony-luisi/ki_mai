@@ -33,7 +33,7 @@ app.use(require('node-sass-middleware')({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
-  secret: 'ssshhhhhh! Top secret!',
+  secret: 'This is a secret!',
   saveUninitialized: true,
   resave: true,
   db: knex,

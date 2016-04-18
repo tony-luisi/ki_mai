@@ -1,7 +1,6 @@
 div.overall-definition.animated.fadeIn(id="def-"+word)
   each def in definition
     - var toWord = def.to.split(",").shift().trim()
-    - console.log('word is', toWord)
     button.single-definition.btn.btn-default&attributes({'from': def.from, 'to': toWord})
       p= def.from + " > " + def.to
       each d in def.definition

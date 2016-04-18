@@ -1,6 +1,5 @@
 var wordsArray = []
 var spellchecked = []
-//var symbol_lookup = ['$', '.', '?', ',']
 var socket = require('./socket')
 var translate = require('./translate')
 
@@ -31,8 +30,6 @@ function isSpellchecked(word){
 
 function getDef(event){
   var word = event.currentTarget.innerHTML
-  console.log('sending', word)
-  // translate.update(word + "$")
   socket.sendDefinition(word, function(err, res){
     if (res.length > 0) {
       translate.update(word+'$', res)
@@ -40,7 +37,7 @@ function getDef(event){
     // $.ajax({
     //   method: "POST",
     //   url: "/word",
-    //   data: { word: word, googleid: $('#googleid').text() }
+    //   data: { word: word }
     // })
     // .done(function( msg ) {
     //   //alert( "Data Saved: " + msg );
@@ -58,6 +55,7 @@ function renderPhrase(words){
     wordButton.className = getClass(word)
     wordButton.innerHTML = word
     wordButton.addEventListener('click', getDef)
+    $('#phrase-pane').tooltip({content: "Awesome title!"})
     $('#phrase-pane').append(wordButton)
   })
 }
@@ -95,9 +93,6 @@ function clear(){
 
 function update(message){
   renderSpelling()
-  // if (message.slice(-1) != ' ') {
-  //   return
-  // }
   var words = message.split(' ')
   renderPhrase(words)
   var newWords = words.filter(function(word){
@@ -113,6 +108,5 @@ function update(message){
 module.exports = {
   checkSpelling: checkSpelling,
   update: update,
-  clear: clear//,
-  //renderSpelling: renderSpelling
+  clear: clear
 }
