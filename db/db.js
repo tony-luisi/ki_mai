@@ -1,4 +1,3 @@
-
 var Knex = require('knex');
 var knexConfig = require('../knexfile')
 

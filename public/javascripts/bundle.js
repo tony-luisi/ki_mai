@@ -51,6 +51,7 @@
 	var translate = __webpack_require__(5);
 	var spelling = __webpack_require__(10);
 
+	//every time a user inputs a keystroke
 	$('form').submit(function () {
 	  input.submitChatMessage('user');
 	  phrase.clear();
@@ -64,12 +65,14 @@
 	  translate.update(message);
 	});
 
+	//every time a user presses the submit button
 	$('#sendbutton').click(function () {
 	  input.submitChatMessage('user');
 	  phrase.clear();
 	  return false;
 	});
 
+	//every time a person clicks something in the word box
 	$('#search-pane').click(function () {
 	  var message = input.getChatMessage();
 	  phrase.update(message);
@@ -182,7 +185,6 @@
 
 	var wordsArray = [];
 	var spellchecked = [];
-	//var symbol_lookup = ['$', '.', '?', ',']
 	var socket = __webpack_require__(2);
 	var translate = __webpack_require__(5);
 
@@ -213,8 +215,6 @@
 
 	function getDef(event) {
 	  var word = event.currentTarget.innerHTML;
-	  console.log('sending', word);
-	  // translate.update(word + "$")
 	  socket.sendDefinition(word, function (err, res) {
 	    if (res.length > 0) {
 	      translate.update(word + '$', res);
@@ -222,7 +222,7 @@
 	    // $.ajax({
 	    //   method: "POST",
 	    //   url: "/word",
-	    //   data: { word: word, googleid: $('#googleid').text() }
+	    //   data: { word: word }
 	    // })
 	    // .done(function( msg ) {
 	    //   //alert( "Data Saved: " + msg );
@@ -240,6 +240,7 @@
 	    wordButton.className = getClass(word);
 	    wordButton.innerHTML = word;
 	    wordButton.addEventListener('click', getDef);
+	    $('#phrase-pane').tooltip({ content: "Awesome title!" });
 	    $('#phrase-pane').append(wordButton);
 	  });
 	}
@@ -277,9 +278,6 @@
 
 	function update(message) {
 	  renderSpelling();
-	  // if (message.slice(-1) != ' ') {
-	  //   return
-	  // }
 	  var words = message.split(' ');
 	  renderPhrase(words);
 	  var newWords = words.filter(function (word) {
@@ -295,8 +293,7 @@
 	module.exports = {
 	  checkSpelling: checkSpelling,
 	  update: update,
-	  clear: clear //,
-	  //renderSpelling: renderSpelling
+	  clear: clear
 	};
 
 /***/ },
@@ -310,8 +307,8 @@
 	var wordsArray = [];
 	var translatedWords = [];
 	var definitionArray = [];
-	var definitionTemplate = __webpack_require__(17);
-	var wordTemplate = __webpack_require__(18);
+	var definitionTemplate = __webpack_require__(6);
+	var wordTemplate = __webpack_require__(9);
 
 	function update(message) {
 	  message = message.split(' ');
@@ -370,9 +367,92 @@
 	};
 
 /***/ },
-/* 6 */,
-/* 7 */,
-/* 8 */
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var jade = __webpack_require__(7);
+
+	module.exports = function template(locals) {
+	var buf = [];
+	var jade_mixins = {};
+	var jade_interp;
+	;var locals_for_with = (locals || {});(function (definition, undefined, word) {
+	buf.push("<div" + (jade.attr("id", "def-"+word, true, true)) + " class=\"overall-definition animated fadeIn\">");
+	// iterate definition
+	;(function(){
+	  var $$obj = definition;
+	  if ('number' == typeof $$obj.length) {
+
+	    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+	      var def = $$obj[$index];
+
+	var toWord = def.to.split(",").shift().trim()
+	buf.push("<button" + (jade.attrs(jade.merge([{"class": "single-definition btn btn-default"},{'from': def.from, 'to': toWord}]), true)) + "><p>" + (jade.escape(null == (jade_interp = def.from + " > " + def.to) ? "" : jade_interp)) + "</p>");
+	// iterate def.definition
+	;(function(){
+	  var $$obj = def.definition;
+	  if ('number' == typeof $$obj.length) {
+
+	    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+	      var d = $$obj[$index];
+
+	buf.push("<p>" + (null == (jade_interp = d) ? "" : jade_interp) + "</p>");
+	    }
+
+	  } else {
+	    var $$l = 0;
+	    for (var $index in $$obj) {
+	      $$l++;      var d = $$obj[$index];
+
+	buf.push("<p>" + (null == (jade_interp = d) ? "" : jade_interp) + "</p>");
+	    }
+
+	  }
+	}).call(this);
+
+	buf.push("</button>");
+	    }
+
+	  } else {
+	    var $$l = 0;
+	    for (var $index in $$obj) {
+	      $$l++;      var def = $$obj[$index];
+
+	var toWord = def.to.split(",").shift().trim()
+	buf.push("<button" + (jade.attrs(jade.merge([{"class": "single-definition btn btn-default"},{'from': def.from, 'to': toWord}]), true)) + "><p>" + (jade.escape(null == (jade_interp = def.from + " > " + def.to) ? "" : jade_interp)) + "</p>");
+	// iterate def.definition
+	;(function(){
+	  var $$obj = def.definition;
+	  if ('number' == typeof $$obj.length) {
+
+	    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
+	      var d = $$obj[$index];
+
+	buf.push("<p>" + (null == (jade_interp = d) ? "" : jade_interp) + "</p>");
+	    }
+
+	  } else {
+	    var $$l = 0;
+	    for (var $index in $$obj) {
+	      $$l++;      var d = $$obj[$index];
+
+	buf.push("<p>" + (null == (jade_interp = d) ? "" : jade_interp) + "</p>");
+	    }
+
+	  }
+	}).call(this);
+
+	buf.push("</button>");
+	    }
+
+	  }
+	}).call(this);
+
+	buf.push("</div>");}.call(this,"definition" in locals_for_with?locals_for_with.definition:typeof definition!=="undefined"?definition:undefined,"undefined" in locals_for_with?locals_for_with.undefined: false?undefined:undefined,"word" in locals_for_with?locals_for_with.word:typeof word!=="undefined"?word:undefined));;return buf.join("");
+	}
+
+/***/ },
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -592,7 +672,7 @@
 	    throw err;
 	  }
 	  try {
-	    str = str || __webpack_require__(9).readFileSync(filename, 'utf8')
+	    str = str || __webpack_require__(8).readFileSync(filename, 'utf8')
 	  } catch (ex) {
 	    rethrow(err, null, lineno)
 	  }
@@ -624,10 +704,24 @@
 
 
 /***/ },
-/* 9 */
+/* 8 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var jade = __webpack_require__(7);
+
+	module.exports = function template(locals) {
+	var buf = [];
+	var jade_mixins = {};
+	var jade_interp;
+	;var locals_for_with = (locals || {});(function (word) {
+	buf.push("<button" + (jade.attr("id", "word-"+word, true, true)) + " class=\"word btn btn-default\"><p>" + (jade.escape(null == (jade_interp = word) ? "" : jade_interp)) + "</p></button>");}.call(this,"word" in locals_for_with?locals_for_with.word:typeof word!=="undefined"?word:undefined));;return buf.join("");
+	}
 
 /***/ },
 /* 10 */
@@ -2159,107 +2253,6 @@
 
 	module.exports = request;
 
-
-/***/ },
-/* 17 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var jade = __webpack_require__(8);
-
-	module.exports = function template(locals) {
-	var buf = [];
-	var jade_mixins = {};
-	var jade_interp;
-	;var locals_for_with = (locals || {});(function (console, definition, undefined, word) {
-	buf.push("<div" + (jade.attr("id", "def-"+word, true, true)) + " class=\"overall-definition animated fadeIn\">");
-	// iterate definition
-	;(function(){
-	  var $$obj = definition;
-	  if ('number' == typeof $$obj.length) {
-
-	    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
-	      var def = $$obj[$index];
-
-	var toWord = def.to.split(",").shift().trim()
-	console.log('word is', toWord)
-	buf.push("<button" + (jade.attrs(jade.merge([{"class": "single-definition btn btn-default"},{'from': def.from, 'to': toWord}]), true)) + "><p>" + (jade.escape(null == (jade_interp = def.from + " > " + def.to) ? "" : jade_interp)) + "</p>");
-	// iterate def.definition
-	;(function(){
-	  var $$obj = def.definition;
-	  if ('number' == typeof $$obj.length) {
-
-	    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
-	      var d = $$obj[$index];
-
-	buf.push("<p>" + (null == (jade_interp = d) ? "" : jade_interp) + "</p>");
-	    }
-
-	  } else {
-	    var $$l = 0;
-	    for (var $index in $$obj) {
-	      $$l++;      var d = $$obj[$index];
-
-	buf.push("<p>" + (null == (jade_interp = d) ? "" : jade_interp) + "</p>");
-	    }
-
-	  }
-	}).call(this);
-
-	buf.push("</button>");
-	    }
-
-	  } else {
-	    var $$l = 0;
-	    for (var $index in $$obj) {
-	      $$l++;      var def = $$obj[$index];
-
-	var toWord = def.to.split(",").shift().trim()
-	console.log('word is', toWord)
-	buf.push("<button" + (jade.attrs(jade.merge([{"class": "single-definition btn btn-default"},{'from': def.from, 'to': toWord}]), true)) + "><p>" + (jade.escape(null == (jade_interp = def.from + " > " + def.to) ? "" : jade_interp)) + "</p>");
-	// iterate def.definition
-	;(function(){
-	  var $$obj = def.definition;
-	  if ('number' == typeof $$obj.length) {
-
-	    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
-	      var d = $$obj[$index];
-
-	buf.push("<p>" + (null == (jade_interp = d) ? "" : jade_interp) + "</p>");
-	    }
-
-	  } else {
-	    var $$l = 0;
-	    for (var $index in $$obj) {
-	      $$l++;      var d = $$obj[$index];
-
-	buf.push("<p>" + (null == (jade_interp = d) ? "" : jade_interp) + "</p>");
-	    }
-
-	  }
-	}).call(this);
-
-	buf.push("</button>");
-	    }
-
-	  }
-	}).call(this);
-
-	buf.push("</div>");}.call(this,"console" in locals_for_with?locals_for_with.console:typeof console!=="undefined"?console:undefined,"definition" in locals_for_with?locals_for_with.definition:typeof definition!=="undefined"?definition:undefined,"undefined" in locals_for_with?locals_for_with.undefined: false?undefined:undefined,"word" in locals_for_with?locals_for_with.word:typeof word!=="undefined"?word:undefined));;return buf.join("");
-	}
-
-/***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var jade = __webpack_require__(8);
-
-	module.exports = function template(locals) {
-	var buf = [];
-	var jade_mixins = {};
-	var jade_interp;
-	;var locals_for_with = (locals || {});(function (word) {
-	buf.push("<button" + (jade.attr("id", "word-"+word, true, true)) + " class=\"word btn btn-default\"><p>" + (jade.escape(null == (jade_interp = word) ? "" : jade_interp)) + "</p></button>");}.call(this,"word" in locals_for_with?locals_for_with.word:typeof word!=="undefined"?word:undefined));;return buf.join("");
-	}
 
 /***/ }
 /******/ ]);
