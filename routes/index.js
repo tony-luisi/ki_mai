@@ -19,7 +19,6 @@ module.exports = function(io) {
   var router = app.Router()
 
   router.get('/', function(req, res, next) {
-    // console.log(req.session)
     res.redirect('/users')
   });
 
@@ -44,7 +43,6 @@ module.exports = function(io) {
     if (!req.user) {
       res.redirect('/users')
     } else{
-      console.log(req.user)
       res.render('index', { title: 'Ki Mai', name: req.user.displayName });
     }
   })

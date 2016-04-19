@@ -27,5 +27,18 @@ module.exports =  {
 
     addUser: function(user){
       return knex('users').insert(user)
+    },
+
+    findOrCreate: function(user){
+      knex('users').where(user)
+        .then(function(result){
+          if (result.length > 0) {
+            console.log('already exists')
+            return result
+          } else {
+            console.log('doesnt exist - creating')
+            return knex('users').insert(user)
+          }
+        })
     }
 }
