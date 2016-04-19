@@ -1,19 +1,34 @@
-var express = require('express');
+///filesystem
+require('dotenv').config();
 var path = require('path');
+
+///express
+var express = require('express');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require('express-session');
+var app = express();
+
+///socket
 var socket_io = require('socket.io')
+var io = socket_io()
+app.io = io
+
+///passport
+var passport = require('passport')
+var FacebookStrategy = require('passport-facebook')
+
+///knex
 var Knex = require('knex');
 var knexConfig = require(__dirname + '/knexfile')
 var knex = Knex(knexConfig[process.env.NODE_ENV || 'development'])
-var users = require('./routes/users');
-var app = express();
-var session = require('express-session');
-var io = socket_io()
-app.io = io
+
+///express route files
 var routes = require('./routes/index')(io);
+var users = require('./routes/users');
+// var auth = require('./routes/auth')
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -39,9 +54,42 @@ app.use(session({
   db: knex,
   maxAge: 300000
 }))
+app.use(passport.initialize());
+app.use(passport.session());
+
+// passport.use(new FacebookStrategy({
+//     clientID: process.env.FACEBOOK_APP_ID,
+//     clientSecret: process.env.FACEBOOK_APP_SECRET,
+//     callbackURL: "http://localhost:3000/auth/facebook/callback"
+//   },
+//   function(accessToken, refreshToken, profile, cb) {
+//     // User.findOrCreate({ facebookId: profile.id }, function (err, user) {
+//     //   return cb(err, user);
+//     // });
+//     var user = profile
+//     console.log('profile', profile)
+//     console.log('cb', cb)
+//     return cb(null, user)
+//   }
+// ));
+
+passport.serializeUser(function(user, cb) {
+  //this gets called around verification
+  console.log("<<  ".green + "I just serialized a user".red, new Date().toJSON() )
+  console.log("<<  ", user)
+  cb(null, user);
+});
+
+passport.deserializeUser(function(obj, cb) {
+  // this gets called with req.user
+  console.log(">>  ".green + "I just deserialize a user".red)
+  console.log(">>  ", obj)
+  cb(null, obj);
+});
 
 app.use('/', routes);
 app.use('/users', users);
+// app.use('/auth', auth)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
