@@ -18,9 +18,7 @@ router.post('/login', function(req, res, next){
         res.redirect('/')
       } else {
         var user = result[0]
-        console.log('user hash', user.password, 'password', req.body.password)
         var authenticatedUser = bcrypt.compareSync(req.body.password, user.password)
-        console.log('authenticated user?', authenticatedUser)
         if (authenticatedUser){
 
           req.session.userId = user.id
@@ -35,7 +33,6 @@ router.post('/login', function(req, res, next){
 
 router.get('/all', function(req, res, next){
   db.getUsers().then(function(result){
-    console.log('users', result)
     res.send(result)
   })
 })
@@ -55,7 +52,6 @@ router.post('/', function(req, res, next){
   bcrypt.hash(user.password, saltRounds, function(err, hash){
     user.password = hash
     db.addUser(user).then(function(result){
-      console.log('row affected', result)
       res.redirect('/')
     })
   })

@@ -24,6 +24,7 @@ var FacebookStrategy = require('passport-facebook')
 var Knex = require('knex');
 var knexConfig = require(__dirname + '/knexfile')
 var knex = Knex(knexConfig[process.env.NODE_ENV || 'development'])
+var db = require(path.join(__dirname, './db/db'));
 
 ///express route files
 var routes = require('./routes/index')(io);
@@ -61,7 +62,7 @@ passport.use(new FacebookStrategy({
     clientID: process.env.FACEBOOK_APP_ID,
     clientSecret: process.env.FACEBOOK_APP_SECRET,
     callbackURL: process.env.DOMAIN + "/auth/facebook/callback",
-    profileFields: ['id', 'displayName', 'photos', 'email']
+    profileFields: ['id', 'displayName', 'email']
   },
   function(accessToken, refreshToken, profile, cb) {
     // User.findOrCreate({ facebookId: profile.id }, function (err, user) {
@@ -69,26 +70,33 @@ passport.use(new FacebookStrategy({
     // });
 
     var user = profile
-    // console.log('profile', profile)
-    // console.log('cb', cb)
-    console.log('fullname', user.displayName)
-    console.log('id', user.id)
 
-    return cb(null, user)
+    var checkUser = {}
+    checkUser.fullname = user.displayName
+    checkUser.email = user.emails[0].value
+    checkUser.facebookid = user.id
+
+    db.findOrCreate(checkUser)
+      // .then(function(result){
+        // console.log("ADDED: ", result)
+        return cb(null, user)
+      // }).catch(function(error){
+      //   console.log(error)
+      // })
   }
 ));
 
 passport.serializeUser(function(user, cb) {
   //this gets called around verification
-  console.log("<<  ".green + "I just serialized a user".red, new Date().toJSON() )
-  console.log("<<  ", user)
+  // console.log("<<  ".green + "I just serialized a user".red, new Date().toJSON() )
+  // console.log("<<  ", user)
   cb(null, user);
 });
 
 passport.deserializeUser(function(obj, cb) {
   // this gets called with req.user
-  console.log(">>  ".green + "I just deserialize a user".red)
-  console.log(">>  ", obj)
+  // console.log(">>  ".green + "I just deserialize a user".red)
+  // console.log(">>  ", obj)
   cb(null, obj);
 });
 
