@@ -1,11 +1,13 @@
 var socket = require('./socket')
 var input = require('./input')
-var wordsArray = []
-var translatedWords = []
-var definitionArray = []
 var definitionTemplate = require('./definition.jade')
 var wordTemplate = require('./word.jade')
 
+var wordsArray = [] //words that have been sent for translation
+var translatedWords = [] //words that have been translated, and the definitions
+var definitionArray = [] //DOM elements that hold the definitions of words translated
+
+//when a word needs to be translated (probably should call this something else)
 function update(message){
   message = message.split(' ')
   message.map(function(word){
@@ -17,6 +19,7 @@ function update(message){
   })
 }
 
+//adds a translation to the DOM
 function addTranslation(data, word){
   if (data.length > 0){
     var defTemp = $.parseHTML(definitionTemplate({ word: word, definition: data}))
@@ -30,6 +33,7 @@ function addTranslation(data, word){
   }
 }
 
+//when a word is clicked on, render the definition for that word
 function wordClick(event){
   var wordLookup = event.currentTarget.id.split('-').pop()
   var correctDefinition = definitionArray.filter(function(define){
@@ -40,6 +44,7 @@ function wordClick(event){
   $(correctDefinition).children('button').click(defClick)
 }
 
+//when the definition is clicked on, replace the word in the input box with the correct word
 function defClick(event){
   var wordToMatch = event.currentTarget.getAttribute("from")
   var wordToReplace = event.currentTarget.getAttribute("to")
@@ -58,6 +63,8 @@ function defClick(event){
   }).join(" ")
   $('#m').val(result)
 }
+
+
 module.exports = {
   update: update
 }

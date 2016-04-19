@@ -46,10 +46,14 @@
 
 	'use strict';
 
-	var input = __webpack_require__(1);
-	var phrase = __webpack_require__(4);
-	var translate = __webpack_require__(5);
-	var spelling = __webpack_require__(10);
+	var input = __webpack_require__(1); //handles input / output of the textbox the user types in
+	var phrase = __webpack_require__(4); //handles the phrase input / output below the input box
+	var translate = __webpack_require__(5); //handles the translation of words
+	var spelling = __webpack_require__(10); //handles the spell checking of words in the phrase box -- not used yet
+
+	$(document).ready(function () {
+	  $('[data-toggle="tooltip"]').tooltip();
+	});
 
 	//every time a user inputs a keystroke
 	$('form').submit(function () {
@@ -84,24 +88,25 @@
 
 	'use strict';
 
-	var socket = __webpack_require__(2);
+	//this module handles all the input and output from a the chat text box that the user types
 	var phrase = __webpack_require__(4);
+	var inputID = '#m';
 
 	//when the user enters a message into the chat window
 	function submitChatMessage(user) {
-	  console.log('here');
-	  var message = $('#m').val();
+	  var message = $(inputID).val();
 	  var username = $('#username').text();
 	  if (message !== '') socket.sendMessage({ from: username, message: message });
-	  $('#m').val('');
+	  $(inputID).val('');
 	}
 
+	//update the chat input box when this is called
 	function updateMessage(message) {
-	  $('#m').val(message);
+	  $(inputID).val(message);
 	}
 
 	function getChatMessage() {
-	  return $('#m').val();
+	  return $(inputID).val();
 	}
 
 	module.exports = {
@@ -183,11 +188,13 @@
 
 	'use strict';
 
+	//this module handles the phrase box, which is the box below the input text box (that deals with either spell checking words, or looking up words that are clicked on to be tranlsated)
 	var wordsArray = [];
 	var spellchecked = [];
 	var socket = __webpack_require__(2);
 	var translate = __webpack_require__(5);
 
+	//if a word needs to be highlighted, this function will change the class
 	function renderSpelling() {
 	  spellchecked.map(function (word) {
 	    if (!word.correct && !$('#word-' + word.word).hasClass()) {
@@ -196,6 +203,7 @@
 	  });
 	}
 
+	//checks to see if the word has already been run through the spellchecker, without having to ask the server again, and returns the word
 	function getSpellchecked(word) {
 	  var spellcheckarray = spellchecked.filter(function (spellObject) {
 	    return spellObject.word === word;
@@ -203,6 +211,7 @@
 	  return spellcheckarray[0];
 	}
 
+	//checks to see if the word has been run through the spellchecker
 	function isSpellchecked(word) {
 	  var spellcheckedWord = false;
 	  spellchecked.map(function (spellObject) {
@@ -213,6 +222,7 @@
 	  return spellcheckedWord;
 	}
 
+	//when a word is clicked, send a request to tranlate the word (but only if a definition of the word exists)
 	function getDef(event) {
 	  var word = event.currentTarget.innerHTML;
 	  socket.sendDefinition(word, function (err, res) {
@@ -230,6 +240,7 @@
 	  });
 	}
 
+	//renders the words on the phrase box (this maybe needs to be put into a jade template)
 	function renderPhrase(words) {
 	  $('#phrase-pane').html('');
 	  words.map(function (word) {
@@ -240,11 +251,13 @@
 	    wordButton.className = getClass(word);
 	    wordButton.innerHTML = word;
 	    wordButton.addEventListener('click', getDef);
-	    $('#phrase-pane').tooltip({ content: "Awesome title!" });
+	    wordButton.setAttribute('data-toogle', "tooltip");
+	    wordButton.setAttribute('title', "HELLO");
 	    $('#phrase-pane').append(wordButton);
 	  });
 	}
 
+	//checks to see if a word has been spell checked and returns the appropriate class of how the element should be highlighted
 	function getClass(word) {
 	  if (isSpellchecked(word)) {
 	    var wordObject = getSpellchecked(word);
@@ -258,6 +271,7 @@
 	  }
 	}
 
+	//sends a word to be spellchecked through the socket
 	function checkSpelling(word) {
 	  socket.sendSpellcheck(word, function (data) {
 	    spellchecked.push({ word: word, correct: data });
@@ -265,6 +279,7 @@
 	  });
 	}
 
+	//if the word ends in dollarsign, . or question >> should turn this into regex
 	function filter(word) {
 	  if (word.slice(-1) == '$' || word.slice(-1) == '.' || word.slice(-1) == '?') {
 	    word = word.slice(0, word.length - 1);
@@ -272,10 +287,12 @@
 	  return word;
 	}
 
+	//clear the phrase pane
 	function clear() {
 	  $('#phrase-pane').html('');
 	}
 
+	//when the input box changes, update the phrase box (i.e. a user pressing a key)
 	function update(message) {
 	  renderSpelling();
 	  var words = message.split(' ');
@@ -304,12 +321,14 @@
 
 	var socket = __webpack_require__(2);
 	var input = __webpack_require__(1);
-	var wordsArray = [];
-	var translatedWords = [];
-	var definitionArray = [];
 	var definitionTemplate = __webpack_require__(6);
 	var wordTemplate = __webpack_require__(9);
 
+	var wordsArray = []; //words that have been sent for translation
+	var translatedWords = []; //words that have been translated, and the definitions
+	var definitionArray = []; //DOM elements that hold the definitions of words translated
+
+	//when a word needs to be translated (probably should call this something else)
 	function update(message) {
 	  message = message.split(' ');
 	  message.map(function (word) {
@@ -321,6 +340,7 @@
 	  });
 	}
 
+	//adds a translation to the DOM
 	function addTranslation(data, word) {
 	  if (data.length > 0) {
 	    var defTemp = $.parseHTML(definitionTemplate({ word: word, definition: data }));
@@ -334,6 +354,7 @@
 	  }
 	}
 
+	//when a word is clicked on, render the definition for that word
 	function wordClick(event) {
 	  var wordLookup = event.currentTarget.id.split('-').pop();
 	  var correctDefinition = definitionArray.filter(function (define) {
@@ -344,6 +365,7 @@
 	  $(correctDefinition).children('button').click(defClick);
 	}
 
+	//when the definition is clicked on, replace the word in the input box with the correct word
 	function defClick(event) {
 	  var wordToMatch = event.currentTarget.getAttribute("from");
 	  var wordToReplace = event.currentTarget.getAttribute("to");
@@ -362,6 +384,7 @@
 	  }).join(" ");
 	  $('#m').val(result);
 	}
+
 	module.exports = {
 	  update: update
 	};
@@ -729,8 +752,8 @@
 
 	'use strict';
 
+	//this module is not used yet - planning on implementing client side spell checking
 	var request = __webpack_require__(11);
-
 	function getSpelling(callback) {
 	  console.log('making request');
 	  request.get('/spelling/mi_NZ.dic').end(function (err, res) {
