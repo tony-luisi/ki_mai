@@ -27,6 +27,5 @@ module.exports =  {
 
     addUser: function(user){
       return knex('users').insert(user)
-
     }
 }

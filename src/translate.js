@@ -1,7 +1,7 @@
 var socket = require('./socket')
 var input = require('./input')
-var definitionTemplate = require('./definition.jade')
-var wordTemplate = require('./word.jade')
+var definitionTemplate = require('./views/definition.jade')
+var wordTemplate = require('./views/word.jade')
 
 var wordsArray = [] //words that have been sent for translation
 var translatedWords = [] //words that have been translated, and the definitions
