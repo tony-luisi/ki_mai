@@ -1,21 +1,23 @@
-var socket = require('./socket')
+//this module handles all the input and output from a the chat text box that the user types
 var phrase = require('./phrase')
+var inputID = '#m'
+
 
 //when the user enters a message into the chat window
 function submitChatMessage(user){
-  console.log('here')
-  var message = $('#m').val()
+  var message = $(inputID).val()
   var username = $('#username').text()
   if (message !== '') socket.sendMessage({ from: username, message: message })
-  $('#m').val('')
+  $(inputID).val('')
 }
 
+//update the chat input box when this is called
 function updateMessage(message){
-  $('#m').val(message)
+  $(inputID).val(message)
 }
 
 function getChatMessage(){
-  return $('#m').val()
+  return $(inputID).val()
 }
 
 module.exports = {
