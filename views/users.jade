@@ -1,24 +1,30 @@
 extends layout
 
 block content
-  div(class='container-fluid')
-    div(class='row' id='titles')
-      div(class='col-md-12 jumbotron')
-        h1 Welcome to Kī Mai
-        form(action='/users/login' method='POST')
-          div(class='row')
-            div(class='form-group' class='col-md-6')
-              label(for='username') Username: 
-              input(type='text' name='username' class='form-control' placeholder='Username')
-          div(class='row')
-            div(class='form-group' class='col-md-6')
-              label(for='password') Password: 
-              input(type='password' name='password' class='form-control' placeholder='Password')
-          div(class='row')
-            div(class='form-group' class='col-md-6')
-              button(class='btn btn-success') Login
-      button(class='btn btn-warning') 
-        a(href='/users/new') Register
+  .container-fluid
+    #row.titles
+      .col-md-12.jumbotron
+        .col-md-6
+          h1.title Login
+          form(action='/users/login' method='POST')
+            div(class='row')
+              div(class='form-group')
+                label(for='username') Username: 
+                input(type='text' name='username' class='form-control' placeholder='Username')
+            div(class='row')
+              div(class='form-group')
+                label(for='password') Password: 
+                input(type='password' name='password' class='form-control' placeholder='Password')
+            div(class='row')
+              div(class='form-group')
+                button(class='btn btn-success') Login
+        div.col-md-6
+          div.logo
+    .row
+      .col-md-1
+        a.btn.btn-warning(href='/users/new') Register
+      .col-md-1
+        a.btn.btn-primary(href='/auth/facebook') Login with Facebook
 
         //- div(class='g-signin2' data-onsuccess='onSignIn')
   //- script(type='text/javascript' src='./javascripts/google.js')
