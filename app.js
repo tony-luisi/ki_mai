@@ -60,7 +60,8 @@ app.use(passport.session());
 passport.use(new FacebookStrategy({
     clientID: process.env.FACEBOOK_APP_ID,
     clientSecret: process.env.FACEBOOK_APP_SECRET,
-    callbackURL: process.env.DOMAIN + "/auth/facebook/callback"
+    callbackURL: process.env.DOMAIN + "/auth/facebook/callback",
+    profileFields: ['id', 'displayName', 'photos', 'email']
   },
   function(accessToken, refreshToken, profile, cb) {
     // User.findOrCreate({ facebookId: profile.id }, function (err, user) {
@@ -72,6 +73,7 @@ passport.use(new FacebookStrategy({
     // console.log('cb', cb)
     console.log('fullname', user.displayName)
     console.log('id', user.id)
+
     return cb(null, user)
   }
 ));
