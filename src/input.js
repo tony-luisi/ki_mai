@@ -1,4 +1,5 @@
 //this module handles all the input and output from a the chat text box that the user types
+var socket = require('./socket')
 var phrase = require('./phrase')
 var inputID = '#m'
 
