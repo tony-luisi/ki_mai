@@ -66,9 +66,12 @@ passport.use(new FacebookStrategy({
     // User.findOrCreate({ facebookId: profile.id }, function (err, user) {
     //   return cb(err, user);
     // });
+
     var user = profile
-    console.log('profile', profile)
-    console.log('cb', cb)
+    // console.log('profile', profile)
+    // console.log('cb', cb)
+    console.log('fullname', user.displayName)
+    console.log('id', user.id)
     return cb(null, user)
   }
 ));
@@ -100,7 +103,7 @@ app.use(function(req, res, next) {
 
 io.on( "connection", function( socket )
 {
-    console.log( "A user connected" );
+    // console.log('client', socket.client);
 });
 
 

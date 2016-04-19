@@ -24,23 +24,13 @@ module.exports = function(io) {
   });
 
   router.post('/word', function(req, res, next) {
-    // console.log('req', req.body)
-    // console.log('googleid', req.body.googleid)
-    db.getUserIDByGoogleID(req.body.googleid).then(function(result){
-      // console.log('result', result[0].id)
-      db.addWord(req.body.word, result[0].id).then(function(result){
-        // console.log('result of words', result)
-        res.send('success')
-      })
-    })
+
   })
 
   router.get('/chat', function(req,res,next){
-    // console.log("USER", req.user)
     if (req.session.userId){
       db.getUser({ id: req.session.userId }).then(function(result){
         var username = result[0].fullname || 'user'
-        // console.log(username)
         res.render('index', { title: 'Ki Mai', name: username });
       })
     } else {
@@ -91,10 +81,7 @@ module.exports = function(io) {
     })
 
     socket.on('spelling', function(word, callback){
-      // console.log('need to spell check word', word)
       var isRight = spellchecker.checkExact(word);
-      // console.log("SPELLED CORRECTLY: ", word, isRight)
-      // console.log("suggest", spellchecker.suggest(word))
       callback(isRight)
     })
 

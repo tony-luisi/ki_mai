@@ -5,7 +5,7 @@ exports.up = function(knex, Promise) {
     table.string('username')
     table.string('fullname')
     table.string('email')
-    // table.integer('facebookid')
+    table.integer('facebookid')
     table.string('password')
     table.timestamps()
   })
