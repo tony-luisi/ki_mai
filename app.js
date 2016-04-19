@@ -28,7 +28,7 @@ var knex = Knex(knexConfig[process.env.NODE_ENV || 'development'])
 ///express route files
 var routes = require('./routes/index')(io);
 var users = require('./routes/users');
-// var auth = require('./routes/auth')
+var auth = require('./routes/auth')
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -57,21 +57,21 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// passport.use(new FacebookStrategy({
-//     clientID: process.env.FACEBOOK_APP_ID,
-//     clientSecret: process.env.FACEBOOK_APP_SECRET,
-//     callbackURL: "http://localhost:3000/auth/facebook/callback"
-//   },
-//   function(accessToken, refreshToken, profile, cb) {
-//     // User.findOrCreate({ facebookId: profile.id }, function (err, user) {
-//     //   return cb(err, user);
-//     // });
-//     var user = profile
-//     console.log('profile', profile)
-//     console.log('cb', cb)
-//     return cb(null, user)
-//   }
-// ));
+passport.use(new FacebookStrategy({
+    clientID: process.env.FACEBOOK_APP_ID,
+    clientSecret: process.env.FACEBOOK_APP_SECRET,
+    callbackURL: "http://localhost:3000/auth/facebook/callback"
+  },
+  function(accessToken, refreshToken, profile, cb) {
+    // User.findOrCreate({ facebookId: profile.id }, function (err, user) {
+    //   return cb(err, user);
+    // });
+    var user = profile
+    console.log('profile', profile)
+    console.log('cb', cb)
+    return cb(null, user)
+  }
+));
 
 passport.serializeUser(function(user, cb) {
   //this gets called around verification
@@ -89,7 +89,7 @@ passport.deserializeUser(function(obj, cb) {
 
 app.use('/', routes);
 app.use('/users', users);
-// app.use('/auth', auth)
+app.use('/auth', auth)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

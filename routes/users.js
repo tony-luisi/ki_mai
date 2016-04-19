@@ -18,8 +18,17 @@ router.post('/login', function(req, res, next){
         res.redirect('/')
       } else {
         var user = result[0]
-        req.session.userId = user.id
-        res.redirect('/chat')
+        console.log('user hash', user.password, 'password', req.body.password)
+        var authenticatedUser = bcrypt.compareSync(req.body.password, user.password)
+        console.log('authenticated user?', authenticatedUser)
+        if (authenticatedUser){
+
+          req.session.userId = user.id
+          res.redirect('/chat')
+        } else {
+          res.redirect('/')
+        }
+
       }
     })
 })
