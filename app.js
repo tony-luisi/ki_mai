@@ -60,7 +60,8 @@ app.use(passport.session());
 passport.use(new FacebookStrategy({
     clientID: process.env.FACEBOOK_APP_ID,
     clientSecret: process.env.FACEBOOK_APP_SECRET,
-    callbackURL: process.env.DOMAIN + "/auth/facebook/callback"
+    callbackURL: process.env.DOMAIN + "/auth/facebook/callback",
+    profileFields: ['id', 'displayName', 'photos', 'email']
   },
   function(accessToken, refreshToken, profile, cb) {
     // User.findOrCreate({ facebookId: profile.id }, function (err, user) {
@@ -101,6 +102,7 @@ app.use(function(req, res, next) {
 io.on( "connection", function( socket )
 {
     console.log( "A user connected" );
+    io.emit('message', { from: "ki mai", message: "A user joined the conversation!"})
 });
 
 

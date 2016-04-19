@@ -5,7 +5,7 @@ var passport = require('passport')
 
 /* GET users listing. */
 router.get('/facebook',
-  passport.authenticate('facebook'));
+  passport.authenticate('facebook', { scope: ['email'] }));
 
 router.get('/facebook/callback',
   passport.authenticate('facebook', { failureRedirect: '/login' }),
