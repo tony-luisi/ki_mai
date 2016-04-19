@@ -89,6 +89,7 @@
 	'use strict';
 
 	//this module handles all the input and output from a the chat text box that the user types
+	var socket = __webpack_require__(2);
 	var phrase = __webpack_require__(4);
 	var inputID = '#m';
 
