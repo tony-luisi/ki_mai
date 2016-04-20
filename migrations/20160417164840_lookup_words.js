@@ -5,6 +5,7 @@ exports.up = function(knex, Promise) {
     table.integer('userid')
     table.string('word')
     table.timestamps()
+    table.unique(['userid', 'word'])
   })
 
 };

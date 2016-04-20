@@ -230,14 +230,13 @@
 	    if (res.length > 0) {
 	      translate.update(word + '$', res);
 	    }
-	    // $.ajax({
-	    //   method: "POST",
-	    //   url: "/word",
-	    //   data: { word: word }
-	    // })
-	    // .done(function( msg ) {
-	    //   //alert( "Data Saved: " + msg );
-	    // });
+	    $.ajax({
+	      method: "POST",
+	      url: "/words/lookup",
+	      data: { word: word }
+	    }).done(function (msg) {
+	      //alert( "Data Saved: " + msg );
+	    });
 	  });
 	}
 
@@ -352,6 +351,7 @@
 	    $('#search-pane').append(defTemp);
 	    $('#word-list').append(wordTemp);
 	    definitionArray.push(defTemp[0]);
+	    translatedWords.push({ word: word, definition: data });
 	  }
 	}
 
@@ -370,6 +370,14 @@
 	function defClick(event) {
 	  var wordToMatch = event.currentTarget.getAttribute("from");
 	  var wordToReplace = event.currentTarget.getAttribute("to");
+	  var definition = event.currentTarget.innerHTML;
+	  $.ajax({
+	    method: "POST",
+	    url: "/words/replace",
+	    data: { fromWord: wordToMatch, toWord: wordToReplace, definition: definition }
+	  }).done(function (msg) {
+	    // alert( "Data Saved: " + msg );
+	  });
 
 	  var inputString = $('#m').val();
 	  console.log('click', event.currentTarget);

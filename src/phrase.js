@@ -39,14 +39,14 @@ function getDef(event){
     if (res.length > 0) {
       translate.update(word+'$', res)
     }
-    // $.ajax({
-    //   method: "POST",
-    //   url: "/word",
-    //   data: { word: word }
-    // })
-    // .done(function( msg ) {
-    //   //alert( "Data Saved: " + msg );
-    // });
+    $.ajax({
+      method: "POST",
+      url: "/words/lookup",
+      data: { word: word }
+    })
+    .done(function( msg ) {
+      //alert( "Data Saved: " + msg );
+    });
   })
 }
 

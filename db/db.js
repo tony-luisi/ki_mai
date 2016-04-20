@@ -8,6 +8,22 @@ module.exports =  {
       return knex.select().table('users')
     },
 
+    getLookupWords(){
+      return knex('lookup_words')
+    },
+
+    getReplaceWords(){
+      return knex('replace_words')
+    },
+
+    getLookupWordsByUser(user){
+      return knex('lookup_words').where(user)
+    },
+
+    getReplaceWordsByUser(user){
+      return knex('replace_words').where(user)
+    },
+
     addWord: function(word, id) {
       console.log('need to add', word, 'id', id)
       return knex('words').insert({ word: word, userid: id })
@@ -34,6 +50,7 @@ module.exports =  {
     },
 
     addReplaceWord: function(word){
+      var newWord = { from_word: 'from', to_word: 'to', definition: 'definition', userid: 1}
       return knex('replace_words').insert(word)
     },
 
@@ -41,11 +58,8 @@ module.exports =  {
       knex('users').where(user)
         .then(function(result){
           if (result.length > 0) {
-            console.log('already exists')
-            // return result
             cb(result[0])
           } else {
-            console.log('doesnt exist - creating')
             knex('users').insert(user).then(function(result){
               knex('users').where(user).then(function(resultUser){ cb(resultUser[0])})
             })
