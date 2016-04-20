@@ -30,6 +30,7 @@ var db = require(path.join(__dirname, './db/db'));
 var routes = require('./routes/index')(io);
 var users = require('./routes/users');
 var auth = require('./routes/auth')
+var words = require('./routes/words')
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -65,24 +66,15 @@ passport.use(new FacebookStrategy({
     profileFields: ['id', 'displayName', 'email']
   },
   function(accessToken, refreshToken, profile, cb) {
-    // User.findOrCreate({ facebookId: profile.id }, function (err, user) {
-    //   return cb(err, user);
-    // });
-
     var user = profile
-
     var checkUser = {}
     checkUser.fullname = user.displayName
     checkUser.email = user.emails[0].value
     checkUser.facebookid = user.id
-
-    db.findOrCreate(checkUser)
-      // .then(function(result){
-        // console.log("ADDED: ", result)
-        return cb(null, user)
-      // }).catch(function(error){
-      //   console.log(error)
-      // })
+    db.findOrCreate(checkUser, function(returnedUser){
+      user.dbid = returnedUser.id
+      return cb(null, user)
+    })
   }
 ));
 
@@ -103,6 +95,7 @@ passport.deserializeUser(function(obj, cb) {
 app.use('/', routes);
 app.use('/users', users);
 app.use('/auth', auth)
+app.use('/words', words)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
