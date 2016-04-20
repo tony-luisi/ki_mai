@@ -11,7 +11,11 @@ router.get('/facebook/callback',
   passport.authenticate('facebook', { failureRedirect: '/login' }),
   function(req, res) {
     // Successful authentication, redirect home.
-    res.redirect('/chatfacebook');
+    // db.getUser({ facebookid: req.user.})
+    // console.log("USER ID", req.user.dbid)
+    req.session.userId = req.user.dbid
+    // req.session.
+    res.redirect('/chat');
   });
 
 module.exports = router;

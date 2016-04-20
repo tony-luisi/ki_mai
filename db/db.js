@@ -29,15 +29,26 @@ module.exports =  {
       return knex('users').insert(user)
     },
 
-    findOrCreate: function(user){
+    addLookupWord: function(word){
+      return knex('lookup_words').insert(word)
+    },
+
+    addReplaceWord: function(word){
+      return knex('replace_words').insert(word)
+    },
+
+    findOrCreate: function(user, cb){
       knex('users').where(user)
         .then(function(result){
           if (result.length > 0) {
             console.log('already exists')
-            return result
+            // return result
+            cb(result[0])
           } else {
             console.log('doesnt exist - creating')
-            return knex('users').insert(user)
+            knex('users').insert(user).then(function(result){
+              knex('users').where(user).then(function(resultUser){ cb(resultUser[0])})
+            })
           }
         })
     }

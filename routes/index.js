@@ -43,6 +43,7 @@ module.exports = function(io) {
     if (!req.user) {
       res.redirect('/users')
     } else{
+      console.log('userid', req.session.userId)
       res.render('index', { title: 'Ki Mai', name: req.user.displayName });
     }
   })

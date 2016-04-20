@@ -12,30 +12,28 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/login', function(req, res, next){
-  db.getUser({ username: req.body.username })
+  db.getUser({ email: req.body.email })
     .then(function(result){
       if (result.length == 0){
         res.redirect('/')
       } else {
+        //need to check if facebook user
         var user = result[0]
-        var authenticatedUser = bcrypt.compareSync(req.body.password, user.password)
-        if (authenticatedUser){
-
-          req.session.userId = user.id
-          res.redirect('/chat')
-        } else {
-          res.redirect('/')
+        if (user.facebookid) {
+          res.redirect('/auth/facebook')
+        } else{
+          var authenticatedUser = bcrypt.compareSync(req.body.password, user.password)
+          if (authenticatedUser){
+            req.session.userId = user.id
+            res.redirect('/chat')
+          } else {
+            res.redirect('/')
+          }
         }
-
       }
     })
 })
 
-router.get('/all', function(req, res, next){
-  db.getUsers().then(function(result){
-    res.send(result)
-  })
-})
 
 router.get('/words', function(req, res, next){
   db.allWords().then(function(result){
