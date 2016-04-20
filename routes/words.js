@@ -25,6 +25,13 @@ router.get('/lookup', function(req, res){
     })
 })
 
+router.get('/lookupUser', function(req, res){
+  db.getLookupWordsByUser({ userid: req.session.userId })
+    .then(function(result){
+      res.send(result)
+    })
+})
+
 router.get('/lookup/:id', function(req, res){
   console.log("id", req.params.id)
   db.getLookupWordsByUser({ userid: req.params.id })
@@ -38,7 +45,13 @@ router.get('/replace', function(req,res){
     .then(function(result){
       res.send(result)
     })
+})
 
+router.get('/replaceUser', function(req,res){
+  db.getReplaceWordsByUser({ userid: req.session.userId })
+    .then(function(result){
+      res.send(result)
+    })
 })
 
 router.get('/replace/:id', function(req,res){
