@@ -2,5 +2,6 @@ div.animated.fadeIn
   div
     each word in words
       //- p= word.from_word + " > " + word.to_word
-      div.replaceWord!= word.definition
+      btn.btn-info.btn-lg.btn-block.replaceWord!= word.definition
+      //- btn btn-primary btn-lg btn-block
       

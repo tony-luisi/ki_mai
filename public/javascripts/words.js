@@ -1861,7 +1861,7 @@
 	    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
 	      var word = $$obj[$index];
 
-	buf.push("<div class=\"logWord\">" + (jade.escape(null == (jade_interp = word.word) ? "" : jade_interp)) + "</div>");
+	buf.push("<button class=\"logWord btn btn-primary btn-lg btn-block\">" + (jade.escape(null == (jade_interp = word.word) ? "" : jade_interp)) + "</button>");
 	    }
 
 	  } else {
@@ -1869,7 +1869,7 @@
 	    for (var $index in $$obj) {
 	      $$l++;      var word = $$obj[$index];
 
-	buf.push("<div class=\"logWord\">" + (jade.escape(null == (jade_interp = word.word) ? "" : jade_interp)) + "</div>");
+	buf.push("<button class=\"logWord btn btn-primary btn-lg btn-block\">" + (jade.escape(null == (jade_interp = word.word) ? "" : jade_interp)) + "</button>");
 	    }
 
 	  }
@@ -1898,7 +1898,7 @@
 	    for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
 	      var word = $$obj[$index];
 
-	buf.push("<div class=\"replaceWord\">" + (null == (jade_interp = word.definition) ? "" : jade_interp) + "</div>");
+	buf.push("<btn class=\"btn-info btn-lg btn-block replaceWord\">" + (null == (jade_interp = word.definition) ? "" : jade_interp) + "</btn>");
 	    }
 
 	  } else {
@@ -1906,7 +1906,7 @@
 	    for (var $index in $$obj) {
 	      $$l++;      var word = $$obj[$index];
 
-	buf.push("<div class=\"replaceWord\">" + (null == (jade_interp = word.definition) ? "" : jade_interp) + "</div>");
+	buf.push("<btn class=\"btn-info btn-lg btn-block replaceWord\">" + (null == (jade_interp = word.definition) ? "" : jade_interp) + "</btn>");
 	    }
 
 	  }
