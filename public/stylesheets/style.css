@@ -72,4 +72,22 @@ a {
 strong {
   background-color: #800000; }
 
+#lookup-pane {
+  height: 30em;
+  width: 100%; }
+
+#replace-pane {
+  height: 30em;
+  width: 100%; }
+
+.logWord {
+  color: pink;
+  border-width: thick;
+  outline: 1px solid; }
+
+.replaceWord {
+  color: cornsilk;
+  border-width: thick;
+  outline: 1px solid; }
+
 /*# sourceMappingURL=style.css.map */

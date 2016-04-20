@@ -1,8 +1,11 @@
 module.exports = {
- entry: "./src/index.js",
+ entry: {
+   bundle: "./src/index.js",
+   words: './src/words.js'
+ },
  output: {
-     path: __dirname,
-     filename: "./public/javascripts/bundle.js"
+     path: __dirname+'/public/javascripts',
+     filename: "[name].js"
  },
  module: {
    // preLoaders: [

@@ -3,3 +3,11 @@ extends layout
 block content
   .test
     h1 Word Log
+    .row
+      .col-md-4
+        h2 Words Translated
+        #lookup-pane.panel.panel-primary
+      .col-md-4
+        h2 Words Replaced
+        #replace-pane.panel.panel-primary
+  script(src='/javascripts/words.js')

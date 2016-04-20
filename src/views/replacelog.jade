@@ -1,0 +1,6 @@
+div.animated.fadeIn
+  div
+    each word in words
+      //- p= word.from_word + " > " + word.to_word
+      div.replaceWord!= word.definition
+      
