@@ -4,7 +4,7 @@ exports.up = function(knex, Promise) {
     table.increments()
     table.string('fullname')
     table.string('email')
-    table.integer('facebookid')
+    table.bigInteger('facebookid')
     table.string('password')
     table.timestamps()
   })
