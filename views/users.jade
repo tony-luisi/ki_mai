@@ -14,7 +14,9 @@ html
     .container-fluid
       #row.titles
         .col-md-12.jumbotron
-          .col-md-6
+          div.col-md-6.col-md-push-6
+            div.logo.animated.pulse
+          .col-md-6.col-md-pull-6
             h1.title Login
             form(action='/users/login' method='POST')
               div(class='row')
@@ -28,13 +30,11 @@ html
               div(class='row')
                 div(class='form-group')
                   button(class='btn btn-success') Login
-          div.col-md-6
-            div.logo.animated.pulse
+
       .row
-        .col-md-1
-          a.btn.btn-warning(href='/users/new') Register
-        .col-md-1
-          a.btn.btn-primary(href='/auth/facebook') Login with Facebook
+        .col-md-12
+          a.btn.btn-warning.btn-register(href='/users/new') Register
+          a.btn.btn-primary.btn-facebook(href='/auth/facebook') Login with Facebook
 
             //- div(class='g-signin2' data-onsuccess='onSignIn')
       //- script(type='text/javascript' src='./javascripts/google.js')

@@ -6,31 +6,29 @@ block content
       div.col-md-12
         h2 Welcome 
           span#username #{name}
-      div(class='col-md-6 col-sm-6')
+      div(class='col-md-6 col-sm-8 col-xs-12')
         h3 Chat
-      div(class='col-md-2 col-sm-2')
+      div(class='col-md-2 hidden-sm hidden-xs')
         h3 Word List
-      div(class='col-md-4 col-sm-4')
+      div(class='col-md-4 col-sm-4 hidden-xs')
         h3 Definition
     div(class='row' id='main-text-area')
-      div(class='col-md-6 col-sm-6')
+      div(class='col-md-6 col-sm-8 col-xs-12')
         div(id='message-pane' class='panel panel-info')
           ul(id='messages')
-      div(class='col-md-2 col-sm-2')
+      div(class='col-md-2 hidden-sm hidden-xs')
         div(id='word-list' class='panel panel-primary')
-      div(class='col-md-4 col-sm-4')
+      div(class='col-md-4 col-sm-4 col-xs-12')
         div(id='search-pane' class='panel panel-primary')
     div(class='row' id='chat-area')
-      div(class='col-md-11')
+      div(class='col-md-11 col-sm-10 col-xs-12')
         form(action='')
           input(id='m' autocomplete='off' class='form-control')
-      div(class='col-md-1')
+      div(class='col-md-1 col-sm-2 hidden-xs')
         button(class='btn btn-success' id='sendbutton') Send
-          //- input()
-          audio
-      div(class='row' id='phrase-area')
-        div(class='col-md-12')
-          div(id='phrase-pane' class='panel panel-primary')
+    div(class='row' id='phrase-area')
+      div(class='col-md-12 col-sm-12 col-xs-12')
+        div(id='phrase-pane' class='panel panel-primary')
     div(id='googleid' style="display: none;")
     script(type='text/javascript' src="/socket.io/socket.io.js")
     script(type='text/javascript' src='./javascripts/bundle.js')
