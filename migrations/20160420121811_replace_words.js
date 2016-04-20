@@ -7,6 +7,7 @@ exports.up = function(knex, Promise) {
     table.string('to_word')
     table.string('definition')
     table.timestamps()
+    table.unique(['from_word', 'to_word', 'definition'])
   })
 
 };
