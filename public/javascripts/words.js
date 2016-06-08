@@ -1418,14 +1418,16 @@
 
 /***/ },
 /* 12 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	
 	/**
 	 * Expose `Emitter`.
 	 */
 
-	module.exports = Emitter;
+	if (true) {
+	  module.exports = Emitter;
+	}
 
 	/**
 	 * Initialize a new `Emitter`.

@@ -8,8 +8,6 @@ html
     meta(name='viewport' contents='width=device-width, initial-scale=1')
     link(rel='stylesheet', href='/stylesheets/style.css')
     link(rel='stylesheet', href='/stylesheets/animate.css')
-    //- script(src='https://apis.google.com/js/platform.js' async defer)
-    //- meta(name='google-signin-client_id' content='202066252657-p6c3mt6h17mnkq4mo40oavd2o1as4r92.apps.googleusercontent.com')
   body
     .container-fluid
       #row.titles
@@ -21,21 +19,16 @@ html
             form(action='/users/login' method='POST')
               div(class='row')
                 div(class='form-group')
-                  label(for='email') Email: 
+                  label(for='email') Email:
                   input(type='text' name='email' class='form-control' placeholder='Email')
               div(class='row')
                 div(class='form-group')
-                  label(for='password') Password: 
+                  label(for='password') Password:
                   input(type='password' name='password' class='form-control' placeholder='Password')
               div(class='row')
                 div(class='form-group')
                   button(class='btn btn-success') Login
-
       .row
         .col-md-12
           a.btn.btn-warning.btn-register(href='/users/new') Register
           a.btn.btn-primary.btn-facebook(href='/auth/facebook') Login with Facebook
-
-            //- div(class='g-signin2' data-onsuccess='onSignIn')
-      //- script(type='text/javascript' src='./javascripts/google.js')
-      //- script(src="https://apis.google.com/js/client:platform.js?onload=startApp")

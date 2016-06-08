@@ -8,6 +8,7 @@ const saltRounds = 10
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
+  console.log('here')
   res.render('users')
 });
 
